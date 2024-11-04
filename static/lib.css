@@ -1,0 +1,81 @@
+body {
+    background-color: #f8f9fa;
+    padding-bottom: 50px;
+  }
+
+  .navbar {
+    background-color: #dc3545;
+    /* Red color */
+  }
+
+    .navbar-brand img {
+height: 30px; /* Reduced logo height */
+width: auto;  /* Maintain aspect ratio */
+}
+
+  .nav-link {
+    color: white !important;
+    margin-right: 15px;
+    padding: 15px 25px; /* Increased padding */
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-link i {
+    margin-right: 5px;
+  }
+
+    .card {
+        margin: 20px 0;
+        padding: 15px;
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        max-width: 500px;  /* Set your desired width */
+        max-height: 600px;
+        height: auto;      /* Keep height flexible or set a fixed height */
+        margin: auto;
+        
+    }
+    .card img {
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        height: 350px;
+        object-fit: cover;
+        width: 100%;
+
+    }
+    .card-body {
+        background-color: #ffffff;
+        border-radius: 0 0 10px 10px;
+    }
+    
+      
+    .dropdown-item:hover {
+        background-color: #f1f1f1;
+    }
+    .btn-danger {
+        background-color: #dc3545;
+        border: none;
+    }
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
+    .footer {
+        background-color: #343a40;
+        color: white;
+        padding: 20px 0;
+        text-align: center;
+        position: relative;
+        bottom: 0;
+        width: 100%;
+        margin-top: 40px;
+    }
+    .form-section {
+        margin-top: 20px;
+        margin-bottom: 20px; /* Adjust space below each form */
+        z-index: 1;
+    }

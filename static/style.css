@@ -1,0 +1,96 @@
+body {
+    background-color: #f8f9fa;
+  }
+
+  .navbar {
+    background-color: #dc3545;
+    /* Red color */
+  }
+
+  .navbar-brand img {
+height: 30px; /* Reduced logo height */
+width: auto;  /* Maintain aspect ratio */
+}
+
+  .nav-link {
+    color: white !important;
+    margin-right: 15px;
+    padding: 15px 25px; /* Increased padding */
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-link i {
+    margin-right: 5px;
+  }
+
+  .welcome-heading {
+    text-align: center;
+    margin-top: 30px;
+    color: #333;
+    font-family: "Roboto", sans-serif;
+    /* Stylish font */
+  }
+
+  .college-logo {
+    display: block;
+    margin: 0 auto 20px auto;
+    max-width: 200px;
+    /* Increase logo size */
+  }
+
+  .card-img-top {
+    height: 200px;
+    /* Set a fixed height for the images */
+    width: 100%;
+    /* Ensure the image takes the full width of the card */
+    object-fit: cover;
+    /* Maintain aspect ratio and crop if necessary */
+  }
+
+  .card {
+    transition: transform 0.2s;
+  }
+
+  .card:hover {
+    transform: scale(1.05);
+  }
+
+  .footer {
+    background-color: #343a40;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+  }
+
+  .carousel-item img {
+    height: 400px;
+    object-fit: cover;
+    width: 100%;
+  }
+
+  .explore-section {
+    padding: 40px 0;
+    text-align: center;
+  }
+
+  .explore-section h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-family: "Roboto", sans-serif;
+  }
+
+  .explore-section .btn-explore {
+    background-color: #dc3545;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-transform: uppercase;
+    font-weight: bold;
+  }
