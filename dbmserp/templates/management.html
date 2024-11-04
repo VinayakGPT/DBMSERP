@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Website Management System</title>
+    {% load static %}
+    <link rel="icon" href="{% static 'images/logo.png' %}" type="image/x-icon" />
+    <link href="https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #333;
+            background-color: #f5f5f7;
+        }
+        .custom-card .card {
+        width: 100%;
+        max-width: 400px; /* Set max width as needed */
+        min-height: 400px; /* Set min height as needed */
+        margin: auto; /* Center-align if smaller than container */
+        }
+
+        @media (min-width: 768px) {
+            .custom-card .card {
+                max-width: 550px;
+                min-height: 450px;
+            }
+        }
+
+        h2,
+        h5 {
+            color: #1d1d1f;
+        }
+
+        h2 {
+            font-weight: 700;
+        }
+
+        .text-apple-blue {
+            color: #0958ac;
+            /* Apple's signature blue */
+            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+            font-weight: 800;
+            /* Bolder weight for emphasis */
+            letter-spacing: 0.5px;
+            /* Slight letter spacing for clarity */
+            text-shadow: 0px 0.5px 2px rgba(0, 0, 0, 0.15);
+            /* Subtle shadow */
+        }
+
+        .container {
+            max-width: 900px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .card img {
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .card-text {
+            color: #86868b;
+        }
+
+        .btn {
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 8px 16px;
+            box-shadow: none;
+            transition: background-color 0.3s;
+        }
+
+        .btn-danger {
+            background-color: #0071e3;
+            border: none;
+        }
+
+        .btn-danger:hover {
+            background-color: #005bb5;
+        }
+
+        .dropdown-menu {
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .dropdown-item {
+            color: #333;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f0f0f5;
+        }
+
+        .form-section h6 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            background-color: #f0f0f5;
+            border: none;
+            box-shadow: none;
+        }
+
+        .form-control:focus {
+            border: none;
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.3);
+        }
+
+        .mb-3 input {
+            padding: 10px 12px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="{% static 'lib.css' %}" />
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const dropdownItems = document.querySelectorAll(".dropdown-item");
+
+            dropdownItems.forEach(function (item) {
+                item.addEventListener("click", function () {
+                    // Hide all currently visible forms and show all images
+                    const allForms = document.querySelectorAll(".form-section");
+                    allForms.forEach(function (form) {
+                        form.classList.remove("show");
+                    });
+
+                    const allImages = document.querySelectorAll(".card-img-top");
+                    allImages.forEach(function (img) {
+                        img.style.display = "block"; // Show all images initially
+                    });
+
+                    // Target the form related to the clicked dropdown item
+                    const targetForm = document.querySelector(
+                        this.getAttribute("data-bs-target")
+                    );
+                    targetForm.classList.add("show"); // Show the targeted form
+
+                    // Find the image in the same container as the form and hide it
+                    const cardContainer = this.closest(".card"); // Find the closest card container
+                    const containerImage = cardContainer.querySelector(".card-img-top");
+                    if (containerImage) {
+                        containerImage.style.display = "none"; // Hide the image of this container
+                    }
+
+                    // Collapse listener to restore the image when form is hidden
+                    const collapseElements = document.querySelectorAll(".collapse");
+                    collapseElements.forEach(function (collapseElement) {
+                        collapseElement.addEventListener(
+                            "hidden.bs.collapse",
+                            function () {
+                                // Restore the image in the current container when the form is closed
+                                const currentCardContainer = collapseElement.closest(".card");
+                                const currentContainerImage =
+                                    currentCardContainer.querySelector(".card-img-top");
+                                if (currentContainerImage) {
+                                    currentContainerImage.style.display = "block"; // Show image again
+                                }
+                            }
+                        );
+                    });
+                });
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="{% static 'images/logo.png' %}" alt="College Logo" />
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}"><i class="bi bi-house-door"></i> <b>Home</b></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'about' %}"><i class="bi bi-info-circle"></i> <b>About</b></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'show_courses' %}"><i class="bi bi-book"></i> <b>Courses</b></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'contact' %}"><i class="bi bi-telephone"></i> <b>Contact Us</b></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h1 class="text-center text-apple-blue">Website Management</h1>
+        <div class="row mt-4">
+            {% if messages %}
+            <div class="alert-container">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <!-- News/Notice Card -->
+            <div class="col-md-6 mb-4 custom-card">
+                <div class="card text-center">
+                    <img src="{% static 'images/lib.webp' %}" class="card-img-top" alt="News/Notice" />
+                    <div class="card-body">
+                        <h5 class="card-title">News/Notice</h5>
+                        <p class="card-text">Manage your website's news and notices.</p>
+                        <p class="card-text"><strong>Total Notices:</strong> {{ total_notices }}</p>
+
+                        <div class="dropdown">
+                            <button class="btn btn-danger dropdown-toggle" type="button" id="newsNoticeDropdown"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                Manage News/Notice
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="newsNoticeDropdown">
+                                <li><button class="dropdown-item" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#addNewsNotice" aria-expanded="false">Add Data</button></li>
+                                <li><button class="dropdown-item" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#updateNewsNotice" aria-expanded="false">Update Data</button>
+                                </li>
+                                <li><button class="dropdown-item" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#deleteNewsNotice" aria-expanded="false">Delete Data</button>
+                                </li>
+                                <li><a href="{% url 'show_news_notices' %}" class="dropdown-item">Show Data</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- Add News/Notice Form -->
+                        <div class="form-section collapse" id="addNewsNotice">
+                            <form id="addNewsNoticeForm" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <h6>Add News/Notice</h6>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="title" placeholder="Title" required />
+                                </div>
+                                <div class="mb-3">
+                                    <textarea class="form-control" name="content" placeholder="Content"
+                                        required></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="date" class="form-control" name="date_posted" required />
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="posted_by" placeholder="Posted By"
+                                        required />
+                                </div>
+                                <button type="submit" class="btn btn-danger" name="add_news_notice">Add Notice</button>
+                            </form>
+                        </div>
+
+                        <!-- Update News/Notice Form -->
+                        <div class="form-section collapse" id="updateNewsNotice">
+                            <form id="updateNewsNoticeForm" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <h6>Update News/Notice</h6>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="notice_id" placeholder="Notice ID"
+                                        required />
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="new_title" placeholder="New Title"
+                                        required />
+                                </div>
+                                <div class="mb-3">
+                                    <textarea class="form-control" name="new_content" placeholder="New Content"
+                                        required></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="date" class="form-control" name="new_date_posted" required />
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="new_posted_by"
+                                        placeholder="New Posted By" required />
+                                </div>
+                                <button type="submit" class="btn btn-danger" name="update_news_notice">Update
+                                    Notice</button>
+                            </form>
+                        </div>
+
+                        <!-- Delete News/Notice Form -->
+                        <div class="form-section collapse" id="deleteNewsNotice">
+                            <form id="deleteNewsNoticeForm" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <h6>Delete News/Notice</h6>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="notice_id" placeholder="Notice ID"
+                                        required />
+                                </div>
+                                <button type="submit" class="btn btn-danger" name="delete_news_notice">Delete
+                                    Notice</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Department Management Card -->
+            <div class="col-md-6 mb-4 custom-card">
+                <div class="card text-center">
+                    <img src="{% static 'images/department.avif' %}" class="card-img-top" alt="Department Management" />
+                    <div class="card-body">
+                        <h5 class="card-title">Department Management</h5>
+                        <p class="card-text">Manage departments in the system.</p>
+            
+                        <!-- Display total departments count -->
+                        <p class="card-text"><strong>Total Departments:</strong> {{ total_departments }}</p>
+            
+                        <div class="dropdown">
+                            <button class="btn btn-danger dropdown-toggle" type="button" id="departmentDropdown"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                Manage Departments
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="departmentDropdown">
+                                <li>
+                                    <button class="dropdown-item" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#addDepartment" aria-expanded="false">
+                                        Add Department
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#updateDepartment" aria-expanded="false">
+                                        Update Department
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#deleteDepartment" aria-expanded="false">
+                                        Delete Department
+                                    </button>
+                                </li>
+                                <!-- Show Data Button -->
+                                <li><a href="{% url 'show_departments' %}" class="dropdown-item">Show Data</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="form-section collapse" id="addDepartment">
+                            <form id="addDepartmentForm" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <h6>Add Department</h6>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="name" placeholder="Department Name"
+                                        required />
+                                </div>
+                                <div class="mb-3">
+                                    <textarea class="form-control" name="description"
+                                        placeholder="Department Description"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-danger" name="add_department">Add
+                                    Department</button>
+                            </form>
+                        </div>
+
+                        <div class="form-section collapse" id="updateDepartment">
+                            <form id="updateDepartmentForm" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <h6>Update Department</h6>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="department_id"
+                                        placeholder="Department ID" required />
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="new_name"
+                                        placeholder="New Department Name" required />
+                                </div>
+                                <div class="mb-3">
+                                    <textarea class="form-control" name="new_description"
+                                        placeholder="New Description"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-danger" name="update_department">Update
+                                    Department</button>
+                            </form>
+                        </div>
+
+                        <div class="form-section collapse" id="deleteDepartment">
+                            <form id="deleteDepartmentForm" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <h6>Delete Department</h6>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="department_id"
+                                        placeholder="Department ID" required />
+                                </div>
+                                <button type="submit" class="btn btn-danger" name="delete_department">Delete
+                                    Department</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slider Card -->
+            <div class="col-md-6 mb-4 custom-card">
+                <div class="card text-center">
+                    <img src="{% static 'images/slider.webp' %}" class="card-img-top" alt="Slider" />
+                    <div class="card-body">
+                        <h5 class="card-title">Slider Management</h5>
+                        <p class="card-text">Manage your website slider images.</p>
+                        
+                        <!-- Display total slider count -->
+                        <p class="card-text"><strong>Total Sliders:</strong> {{ total_sliders }}</p>
+            
+                        <div class="dropdown">
+                            <button class="btn btn-danger dropdown-toggle" type="button" id="sliderDropdown"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                Manage Slider
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="sliderDropdown">
+                                <li>
+                                    <button class="dropdown-item" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#addSlider" aria-expanded="false">Add Data</button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#updateSlider" aria-expanded="false">Update Data</button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#deleteSlider" aria-expanded="false">Delete Data</button>
+                                </li>
+                                <!-- Show Data Button -->
+                                <li><a href="{% url 'show_sliders' %}" class="dropdown-item">Show Data</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- Add Slider Form -->
+                        <div class="form-section collapse" id="addSlider">
+                            <form id="addSliderForm" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <h6>Add Slider Image</h6>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="image_url" placeholder="Image URL"
+                                        required />
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="caption" placeholder="Caption"
+                                        required />
+                                </div>
+                                <div class="mb-3">
+                                    <input type="number" class="form-control" name="order" placeholder="Order"
+                                        required />
+                                </div>
+                                <button type="submit" class="btn btn-danger" name="add_slider">Add Slider</button>
+                            </form>
+                        </div>
+
+                        <!-- Update Slider Form -->
+                        <div class="form-section collapse" id="updateSlider">
+                            <form id="updateSliderForm" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <h6>Update Slider Image</h6>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="slider_id" placeholder="Slider ID"
+                                        required />
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="new_image_url"
+                                        placeholder="New Image URL" required />
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="new_caption" placeholder="New Caption"
+                                        required />
+                                </div>
+                                <div class="mb-3">
+                                    <input type="number" class="form-control" name="new_order" placeholder="New Order"
+                                        required />
+                                </div>
+                                <button type="submit" class="btn btn-danger" name="update_slider">Update Slider</button>
+                            </form>
+                        </div>
+
+                        <!-- Delete Slider Form -->
+                        <div class="form-section collapse" id="deleteSlider">
+                            <form id="deleteSliderForm" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <h6>Delete Slider Image</h6>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="slider_id" placeholder="Slider ID"
+                                        required />
+                                </div>
+                                <button type="submit" class="btn btn-danger" name="delete_slider">Delete Slider</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Ticker Stats Card -->
+            <div class="col-md-6 mb-4 custom-card">
+                <div class="card text-center">
+                    <img src="{% static 'images/fine.avif' %}" class="card-img-top" alt="Fine Collection Stats" />
+                    <div class="card-body">
+                        <h5 class="card-title">Ticker</h5>
+                        <p class="card-text">Manage ticker messages.</p>
+                        
+                        <!-- Display total ticker count -->
+                        <p class="card-text"><strong>Total Tickers:</strong> {{ total_tickers }}</p>
+            
+                        <div class="dropdown">
+                            <button class="btn btn-danger dropdown-toggle" type="button" id="fineDropdown"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                Manage Tickers
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="fineDropdown">
+                                <li>
+                                    <button class="dropdown-item" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#addTicker" aria-expanded="false">
+                                        Add Data
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#updateTicker" aria-expanded="false">
+                                        Update Data
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#deleteTicker" aria-expanded="false">
+                                        Delete Data
+                                    </button>
+                                </li>
+                                <!-- Show Data Button -->
+                                <li><a href="{% url 'show_tickers' %}" class="dropdown-item">Show Data</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="form-section collapse" id="addTicker">
+                            <form id="addTickerForm" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <h6>Add Ticker</h6>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="message" placeholder="Message"
+                                        required />
+                                </div>
+                                <div class="mb-3">
+                                    <input type="date" class="form-control" name="date_created"
+                                        placeholder="Date Created" required />
+                                </div>
+                                <button type="submit" class="btn btn-danger" name="add_ticker">Add Ticker</button>
+                            </form>
+                        </div>
+
+                        <div class="form-section collapse" id="updateTicker">
+                            <form id="updateTickerForm" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <h6>Update Ticker</h6>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="ticker_id" placeholder="Ticker ID"
+                                        required />
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="new_message" placeholder="New Message"
+                                        required />
+                                </div>
+                                <div class="mb-3">
+                                    <input type="date" class="form-control" name="new_date" placeholder="New Date"
+                                        required />
+                                </div>
+                                <button type="submit" class="btn btn-danger" name="update_ticker">Update Ticker</button>
+                            </form>
+                        </div>
+
+                        <div class="form-section collapse" id="deleteTicker">
+                            <form id="deleteTickerForm" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <h6>Delete Ticker</h6>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="ticker_id" placeholder="Ticker ID"
+                                        required />
+                                </div>
+                                <button type="submit" class="btn btn-danger" name="delete_ticker">Delete Ticker</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image Gallery Card -->
+            <div class="col-md-6 mb-4 custom-card">
+                <div class="card text-center">
+                    <img src="{% static 'images/gallery.avif' %}" class="card-img-top" alt="Image Gallery" />
+                    <div class="card-body">
+                        <h5 class="card-title">Image Gallery</h5>
+                        <p class="card-text">Manage images and captions.</p>
+                        
+                        <!-- Display total image count -->
+                        <p class="card-text"><strong>Total Images:</strong> {{ total_images }}</p>
+            
+                        <div class="dropdown">
+                            <button class="btn btn-danger dropdown-toggle" type="button" id="galleryDropdown"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                Manage Gallery
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="galleryDropdown">
+                                <li>
+                                    <button class="dropdown-item" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#addImage" aria-expanded="false">
+                                        Add Image
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#updateImage" aria-expanded="false">
+                                        Update Image
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#deleteImage" aria-expanded="false">
+                                        Delete Image
+                                    </button>
+                                </li>
+                                <!-- Show Data Button -->
+                                <li><a href="{% url 'show_gallery' %}" class="dropdown-item">Show Data</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="form-section collapse" id="addImage">
+                            <form id="addImageForm" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <h6>Add Image</h6>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="image_url" placeholder="Image URL"
+                                        required />
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="caption" placeholder="Caption"
+                                        required />
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="uploaded_by" placeholder="Uploaded By"
+                                        required />
+                                </div>
+                                <button type="submit" class="btn btn-danger" name="add_image">Add Image</button>
+                            </form>
+                        </div>
+
+                        <div class="form-section collapse" id="updateImage">
+                            <form id="updateImageForm" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <h6>Update Image</h6>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="image_id" placeholder="Image ID"
+                                        required />
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="new_image_url"
+                                        placeholder="New Image URL" />
+                                </div>
+
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="new_caption"
+                                        placeholder="New Caption" />
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="uploaded_by" placeholder="Uploaded By"
+                                        required />
+                                </div>
+                                <button type="submit" class="btn btn-danger" name="update_image">Update Image</button>
+                            </form>
+                        </div>
+
+                        <div class="form-section collapse" id="deleteImage">
+                            <form id="deleteImageForm" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <h6>Delete Image</h6>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="image_id" placeholder="Image ID"
+                                        required />
+                                </div>
+                                <button type="submit" class="btn btn-danger" name="delete_image">Delete Image</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Gallery Card -->
+            <div class="col-md-6 mb-4 custom-card">
+                <div class="card text-center">
+                    <img src="{% static 'images/video.avif' %}" class="card-img-top" alt="Video Gallery" />
+                    <div class="card-body">
+                        <h5 class="card-title">Video Gallery</h5>
+                        <p class="card-text">Manage videos in the gallery.</p>
+                        <p class="card-text"><strong>Total Videos:</strong> {{ total_videos }}</p>
+            
+                        <div class="dropdown">
+                            <button class="btn btn-danger dropdown-toggle" type="button" id="videoDropdown"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                Manage Videos
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="videoDropdown">
+                                <li>
+                                    <button class="dropdown-item" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#addVideo" aria-expanded="false">
+                                        Add Video
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#updateVideo" aria-expanded="false">
+                                        Update Video
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#deleteVideo" aria-expanded="false">
+                                        Delete Video
+                                    </button>
+                                </li>
+                                <li><a href="{% url 'show_videos' %}" class="dropdown-item">Show Videos</a></li>
+                            </ul>
+                        </div>
+                        <div class="form-section collapse" id="addVideo">
+                            <form id="addVideoForm" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <h6>Add Video</h6>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="video_url" placeholder="Video URL"
+                                        required />
+                                </div>
+                                <div class="mb-3">
+                                    <textarea class="form-control" name="description" placeholder="Video Description"
+                                        required></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="uploaded_by" placeholder="Uploaded By"
+                                        required />
+                                </div>
+                                <button type="submit" class="btn btn-danger" name="add_video">Add Video</button>
+                            </form>
+                        </div>
+
+                        <div class="form-section collapse" id="updateVideo">
+                            <form id="updateVideoForm" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <h6>Update Video</h6>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="video_id" placeholder="Video ID"
+                                        required />
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="new_video_url"
+                                        placeholder="New Video URL" required />
+                                </div>
+                                <div class="mb-3">
+                                    <textarea class="form-control" name="new_description" placeholder="New Description"
+                                        required></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="new_uploaded_by"
+                                        placeholder="New Uploaded By" required />
+                                </div>
+                                <button type="submit" class="btn btn-danger" name="update_video">Update Video</button>
+                            </form>
+                        </div>
+
+                        <div class="form-section collapse" id="deleteVideo">
+                            <form id="deleteVideoForm" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <h6>Delete Video</h6>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="video_id" placeholder="Video ID"
+                                        required />
+                                </div>
+                                <button type="submit" class="btn btn-danger" name="delete_video">Delete Video</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Faculty Management Stats Card -->
+            <div class="col-md-6 mb-4 custom-card">
+                <div class="card text-center">
+                    <img src="{% static 'images/faculty.png' %}" class="card-img-top" alt="Faculty Management" />
+                    <div class="card-body">
+                        <h5 class="card-title">Faculty Management</h5>
+                        <p class="card-text">Manage faculty records.</p>
+                        
+                        <!-- Display total faculty count -->
+                        <p class="card-text"><strong>Total Faculty:</strong> {{ total_faculty }}</p>
+            
+                        <div class="dropdown">
+                            <button class="btn btn-danger dropdown-toggle" type="button" id="facultyDropdown"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                Manage Faculty
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="facultyDropdown">
+                                <li>
+                                    <button class="dropdown-item" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#addFaculty" aria-expanded="false">
+                                        Add Faculty
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#updateFaculty" aria-expanded="false">
+                                        Update Faculty
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#deleteFaculty" aria-expanded="false">
+                                        Delete Faculty
+                                    </button>
+                                </li>
+                                <!-- Show Data Button -->
+                                <li><a href="{% url 'show_faculty' %}" class="dropdown-item">Show Data</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="form-section collapse" id="addFaculty">
+                            <form id="addFacultyForm" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <h6>Add Faculty</h6>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="name" placeholder="Name" required />
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="designation" placeholder="Designation"
+                                        required />
+                                </div>
+                                <div class="mb-3">
+                                    <select class="form-select" name="department" required>
+                                        <option value="">Select Department</option>
+                                        {% for department in departments %}
+                                        <option value="{{ department.id }}">{{ department.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="contact" placeholder="Contact Number"
+                                        required />
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="photo_url" placeholder="Photo URL"
+                                        required />
+                                </div>
+                                <button type="submit" class="btn btn-danger" name="add_faculty">Add Faculty</button>
+                            </form>
+                        </div>
+
+                        <div class="form-section collapse" id="updateFaculty">
+                            <form id="updateFacultyForm" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <h6>Update Faculty</h6>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="faculty_id" placeholder="Faculty ID"
+                                        required />
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="new_name" placeholder="New Name"
+                                        required />
+                                </div>
+                                <div class="mb-3">
+                                    <select class="form-select" name="new_department" required>
+                                        <option value="">Select Department</option>
+                                        {% for department in departments %}
+                                        <option value="{{ department.id }}">{{ department.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="new_designation"
+                                        placeholder="New Designation" required />
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="new_contact"
+                                        placeholder="Contact Number" required />
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="new_photo_url" placeholder="Photo URL"
+                                        required />
+                                </div>
+                                <button type="submit" class="btn btn-danger" name="update_faculty">Update
+                                    Faculty</button>
+                            </form>
+                        </div>
+
+                        <div class="form-section collapse" id="deleteFaculty">
+                            <form id="deleteFacultyForm" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <h6>Delete Faculty</h6>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="faculty_id" placeholder="Faculty ID"
+                                        required />
+                                </div>
+                                <button type="submit" class="btn btn-danger" name="delete_faculty">Delete
+                                    Faculty</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <!-- Contact Information -->
+                <div class="col-md-4">
+                    <h5>Contact Us</h5>
+                    <p>ABC College, 123 Main St, City, State, Zip</p>
+                    <p>Email: info@abccollege.edu</p>
+                    <p>Phone: (123) 456-7890</p>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="col-md-4">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Courses</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- Social Media Links -->
+                <div class="col-md-4">
+                    <h5>Follow Us</h5>
+                    <a href="#" class="text-white me-2"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="text-white me-2"><i class="bi bi-twitter"></i></a>
+                    <a href="#" class="text-white me-2"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="text-white"><i class="bi bi-linkedin"></i></a>
+                </div>
+            </div>
+
+            <!-- Footer Bottom -->
+            <div class="mt-4 text-center">
+                <p>&copy; 2024 ABC College. All Rights Reserved.</p>
+                <p>
+                    Designed with <i class="bi bi-heart-fill text-danger"></i> by ABC
+                    College Web Team
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+</body>
+
+</html>
