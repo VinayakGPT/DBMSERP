@@ -132,11 +132,11 @@ class LibraryInventory(models.Model):
 
 class LibraryMember(models.Model):
     id = models.AutoField(primary_key=True)
-    member = models.ForeignKey(RegisteredStudent, on_delete=models.CASCADE)  # FK to RegisteredStudent
+    student = models.ForeignKey(RegisteredStudent, on_delete=models.CASCADE)  # FK to RegisteredStudent
     membership_date = models.DateField()
 
     def __str__(self):
-        return str(self.member)
+        return str(self.student)
 
 class LibraryFineCollection(models.Model):
     id = models.AutoField(primary_key=True)

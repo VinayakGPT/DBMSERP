@@ -1,0 +1,208 @@
+/* Global Styles */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #f4f6f9;
+  font-family: "Roboto", sans-serif;
+  color: #333;
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+/* Navbar */
+.navbar {
+  background-color: #02012f;
+  padding: 15px 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-brand img {
+  height: 60px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.navbar-brand span {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.nav-link {
+  color: #ffffff !important;
+  margin-right: 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #e0e4f1 !important;
+}
+  
+.college-logo {
+    display: block;
+    margin: 0 auto;
+    max-width: 150px;
+    border-radius: 50%;
+  }
+  
+  
+  /* Welcome Heading Styles */
+  .welcome-heading {
+    background-color: #e9ecef; /* Light gray background */
+    padding: 60px 20;
+  }
+  
+  .welcome-heading h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #010050;
+  }
+  
+  .welcome-heading p {
+    font-size: 1.2rem;
+    color: #666;
+  }
+  
+  /* Contact Section Styles */
+  .contact-section {
+    padding: 40px 0;
+  }
+  
+  .contact-section h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  
+  .contact-info h3 {
+    font-size: 1.5rem;
+    margin: 10px 0;
+  }
+  
+  .contact-info p {
+    font-size: 1rem;
+    color: #555;
+  }
+  
+  /* About Section Styles */
+  .about-section {
+    padding: 40px 0;
+    background-color: #e9ecef; /* Light gray background for contrast */
+  }
+  
+  .about-section h2 {
+    font-size: 2rem;
+    margin-bottom: 30px;
+  }
+  
+  /* Team Card Styles */
+  .team-card {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s;
+    height: 350px; /* Increase card height */
+  }
+  
+  .team-card:hover {
+    transform: scale(1.05);
+  }
+  
+  .card-img-top {
+    width: 100%;
+    height: 200px; /* Fixed height for image */
+    object-fit: cover; /* Ensures image covers the area */
+  }
+  
+  /* Info Overlay */
+  .info-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  .team-card:hover .info-overlay {
+    opacity: 1;
+  }
+  
+  .card-body h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  /* Footer Styles */
+  .footer {
+    background-color: #343a40; /* Dark background for the footer */
+    color: #fff;
+  }
+  
+  .footer p {
+    margin: 10px 0;
+  }
+  
+  .footer a {
+    color: #ffc107; /* Bootstrap warning color for links */
+    text-decoration: none;
+  }
+  
+  .footer a:hover {
+    text-decoration: underline;
+  }
+  
+  /* FAQ Section Styles */
+.faq-section {
+  padding: 40px 0;
+  background-color: #f8f9fa;
+}
+
+.faq-section h2 {
+  font-size: 2rem;
+  margin-bottom: 30px;
+}
+
+.accordion-button {
+  background-color: #02012f;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.accordion-button:not(.collapsed) {
+  color: #e0e4f1;
+  background-color: #343a40;
+}
+
+.accordion-body {
+  font-size: 0.9rem;
+  color: #555;
+  padding: 15px;
+  background-color: #e9ecef;
+}
+
+  
+
+

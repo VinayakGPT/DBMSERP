@@ -1,0 +1,250 @@
+/* Global Styles */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #f4f6f9;
+  font-family: "Roboto", sans-serif;
+  color: #333;
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+/* Navbar */
+.navbar {
+  background-color: #02012f;
+  padding: 15px 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-brand img {
+  height: 60px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.navbar-brand span {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.nav-link {
+  color: #ffffff !important;
+  margin-right: 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #e0e4f1 !important;
+}
+  
+  
+  /* Welcome Heading */
+  .welcome-heading {
+    text-align: center;
+    padding: 60px 20px;
+    background-color: #f4f4f4;
+  }
+  
+  .welcome-heading h1 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #010050;
+  }
+  
+  .welcome-heading p {
+    color: #666;
+    margin-top: 10px;
+  }
+
+  /* College Logo */
+.college-logo {
+    display: block;
+    margin: 0 auto;
+    max-width: 150px;
+    border-radius: 50%;
+  }
+  
+  
+  /* College Image */
+  .about-image img {
+    display: block;
+    margin: 40px auto;
+    max-width: 80%;
+    border-radius: 10px;
+  }
+  
+  /* About Section */
+  .about-section {
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .about-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    align-items: center;
+    max-width: 1000px;
+    width: 100%;
+  }
+  
+  .about-content {
+    max-width: 500px;
+  }
+  
+  .about-content h2 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .about-content p {
+    color: #666;
+    margin-bottom: 15px;
+  }
+  
+  .about-us {
+    padding: 50px 0;
+  }
+  
+  .about-image {
+    max-width: 100%; /* Ensures the image is responsive */
+    height: auto;    /* Maintains aspect ratio */
+    border-radius: 8px; /* Optional: adds rounded corners */
+  }
+  
+  .btn-learn-more {
+    display: inline-block;
+    background-color: #f1c40f;
+    color: #333;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+  }
+  
+  .btn-learn-more:hover {
+    background-color: #333;
+    color: #f1c40f;
+  }
+  
+  /* Explore Section */
+  .explore-section {
+    text-align: center;
+    padding: 60px 20px;
+    background-color: #f4f4f4;
+  }
+  
+  .explore-section h2 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .explore-section p {
+    max-width: 700px;
+    color: #666;
+    margin: 0 auto 20px;
+  }
+  
+  .btn-explore {
+    display: inline-block;
+    background-color: #0e0bc0;
+    color: #fff;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+  }
+  
+  .btn-explore:hover {
+    background-color: #f1c40f;
+    color: #0e0bc0;
+  }
+  
+  /* Why Choose Us Section */
+  .why-choose-us {
+    padding: 60px 20px;
+    text-align: center;
+  }
+  
+  .why-choose-us h2 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 30px;
+  }
+  
+  .why-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+  }
+  
+  .why-card {
+    width: 250px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+  }
+  
+  .why-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .why-card h3 {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .why-card p {
+    font-size: 0.9rem;
+    color: #666;
+  }
+  
+  /* Footer */
+  .footer {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 20px 0;
+  }
+  
+  .footer .container {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  
+  .footer p {
+    margin-bottom: 10px;
+  }
+  
+  .footer a {
+    color: #f1c40f;
+    text-decoration: none;
+  }
+  
+  .footer a:hover {
+    color: #fff;
+  }
+  
