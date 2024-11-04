@@ -1,0 +1,177 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="icon" href="{% static 'images/logo.png' %}" type="image/x-icon" />
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Text:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            background: linear-gradient(135deg, #f0f0f5, #3b6ed7);
+            color: #333;
+            font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            position: relative;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            margin: auto;
+            align-items: center;
+            position: relative; /* To position child elements */
+            top: 30px;
+        }
+
+        /* Logo container styles */
+        .logo-container {
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 50%;
+            width: 80px; /* Adjust size as needed */
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-container img {
+            width: 200px; /* Adjust size as needed */
+            height: 200px;
+            border-radius: 50%;
+        }
+
+        .description-container {
+            flex: 1;
+            padding: 40px;
+            color: #555;
+        }
+
+        .description-container h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .description-container p {
+            line-height: 1.5;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .description-images {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .description-images img {
+            width: 100px;
+            height: 100px;
+            border-radius: 12px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-container {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            max-width: 380px;
+            width: 100%;
+            text-align: center;
+            margin-left: 20px;
+        }
+
+        .login-container h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .login-container form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .login-container input[type="text"],
+        .login-container input[type="password"] {
+            padding: 14px;
+            margin-bottom: 18px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            outline: none;
+            font-size: 15px;
+            transition: border 0.3s, box-shadow 0.3s;
+            position: relative;
+            left: 20px;
+        }
+
+        .login-container input[type="text"]:focus,
+        .login-container input[type="password"]:focus {
+            border-color: #007aff;
+            box-shadow: 0 0 6px rgba(0, 122, 255, 0.3);
+        }
+
+        .login-container button {
+            background-color: #007aff;
+            color: #ffffff;
+            padding: 14px;
+            font-size: 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s , box-shadow 0.2s;
+        }
+
+        .login-container button:hover {
+            background-color: #005bb5;
+            box-shadow: 0 3px 8px rgba(0, 122, 255, 0.2);
+        }
+
+        .login-container button:active {
+            transform: translateY(1px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Logo container at the top of the page -->
+    <div class="logo-container">
+        <img src="{% static 'images/logo.png' %}" alt="Logo">
+    </div>
+    
+    <div class="container">
+        <div class="description-container">
+            <h1>Welcome to the University ERP System!</h1>
+            <p>Streamlining academic processes and enhancing communication between students and faculty, our platform simplifies your educational experience. Manage your courses, track your performance, and access essential resources all in one place.</p>
+            <!-- <div class="description-images">
+                <img src="{% static 'images/erp1.jpg' %}" alt="Image 1">
+                <img src="{% static 'images/erp2.jpg' %}" alt="Image 2">
+            </div> -->
+        </div>
+        <div class="login-container">
+            <h1>Sign In</h1>
+            {% if form.errors %}
+                <p class="error">Invalid username or password</p>
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                <b>{{ form.as_p }}</b>
+                <button type="submit"><b>Log In</b></button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

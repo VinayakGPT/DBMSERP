@@ -1,0 +1,180 @@
+/* Global Styles */
+body {
+  background-color: #f4f6f9;
+  font-family: "Roboto", sans-serif;
+  color: #333;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Navbar Styles */
+.navbar {
+  background-color: #02012f;
+  padding: 15px 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand img {
+  height: 60px;
+  width: auto;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+/* .navbar-logo{
+  width: 50px;
+  height: 50px;
+} */
+
+.navbar-brand span {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.nav-link {
+  color: #ffffff !important;
+  margin-right: 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.nav-link:hover {
+  color: #e0e4f1 !important;
+}
+
+/* Welcome Heading */
+.welcome-heading {
+  text-align: center;
+  margin: 50px 0 30px;
+  font-size: 2.2rem;
+  font-weight: 600;
+  color: #010050;
+}
+
+/* College Logo */
+.college-logo {
+  display: block;
+  margin: 0 auto;
+  max-width: 150px;
+  border-radius: 50%;
+}
+
+/* Card Styles */
+.card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.card-img-top {
+  height: 180px;
+  width: 100%;
+  object-fit: cover;
+  border-bottom: 4px solid #010050;
+}
+
+/* Button Styles */
+.btn-primary,
+.btn-explore {
+  background-color: #000538;
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 5px;
+  font-weight: 600;
+  transition: background-color 0.3s;
+  text-transform: uppercase;
+}
+
+.btn-primary:hover,
+.btn-explore:hover {
+  background-color: #0c086f;
+}
+
+.btn-danger {
+  background-color: #08068b !important; /* Override the default color */
+  border: none;
+}
+
+.btn-danger:hover {
+  background-color: #0e0bc0 !important;
+}
+
+/* Footer Styles */
+.footer {
+  background-color: #02012f;
+  color: #ffffff;
+  padding: 25px 0;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.footer a {
+  color: #c7c9d3;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.footer a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+/* Carousel Styles */
+.carousel-item img {
+  height: 550px;
+  width: 100%;
+  object-fit: cover;
+}
+
+/* Explore Section */
+.explore-section {
+  padding: 50px 0;
+  background-color: #f4f6f9;
+  text-align: center;
+}
+
+.explore-section h2 {
+  color: #010050;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+.explore-section .btn-explore {
+  background-color: #000538;
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.explore-section .btn-explore:hover {
+  background-color: #0c086f;
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+  .welcome-heading {
+    font-size: 1.8rem;
+  }
+  
+  .explore-section h2 {
+    font-size: 1.8rem;
+  }
+
+  .card-img-top {
+    height: 160px;
+  }
+}
