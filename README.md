@@ -8,8 +8,6 @@ The College Management System is a comprehensive application designed to manage 
 
 - **Department Management**: Create and manage departments within the college.
 - **News and Notices**: Post news and updates for students and faculty.
-- **Slider Management**: Manage image sliders for announcements or events.
-- **Ticker Management**: Display scrolling messages for important information.
 - **Image and Video Galleries**: Maintain galleries for visual content.
 - **Faculty Management**: Manage faculty details including contact information.
 - **Course Management**: Define streams and associated courses.
