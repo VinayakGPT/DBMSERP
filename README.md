@@ -18,7 +18,7 @@ The College Management System is a comprehensive application designed to manage 
 - **Grievance Handling**: Submit and track grievances raised by students.
 - **Feedback System**: Collect feedback from students regarding various aspects of the college.
 - **Enquiry Management**: Handle enquiries from prospective students.
-- - **Slider Management**: Manage image sliders for announcements or events.
+- **Slider Management**: Manage image sliders for announcements or events.
 - **Ticker Management**: Display scrolling messages for important information.
 
 ## Entity-Relationship Diagram (ERD)
