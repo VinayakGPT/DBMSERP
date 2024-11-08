@@ -1,6 +1,6 @@
 # forms.py
 from django import forms
-from .models import Ticker,LibraryInventory, CertificateType, CertificateApplication, LibraryMember, LibraryFineCollection, BookIssued, Department, NewsNotice, Faculty, ImageGallery, VideoGallery, LibraryInventory, LibraryMember, Grievance, Feedback, RegisteredStudent,StreamCourse,AdmissionStat,FeeCollection,Slider
+from .models import Ticker,LibraryInventory,FacultyCourseAssignment, CertificateType, CertificateApplication, LibraryMember,CourseMarks, LibraryFineCollection, BookIssued, Department, NewsNotice, Faculty, ImageGallery, VideoGallery, LibraryInventory, LibraryMember, Grievance, Feedback, RegisteredStudent,StreamCourse,AdmissionStat,FeeCollection,Slider
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django import forms
@@ -29,7 +29,6 @@ class UpdateInventoryForm(forms.Form):
         new_quantity = self.cleaned_data['new_quantity']
         new_category = self.cleaned_data['new_category']
         
-        # Fetch the existing LibraryInventory instance
         book = LibraryInventory.objects.filter(id=book_id).first()
         if book:
             book.book_name = new_book_name
@@ -38,32 +37,31 @@ class UpdateInventoryForm(forms.Form):
             book.category = new_category
             book.save()
             return True
-        return False  # Return False if the book ID is not found
+        return False 
 
 class DeleteInventoryForm(forms.Form):
     book_id = forms.IntegerField(label="Book ID")
 
     def delete_inventory(self):
         book_id = self.cleaned_data['book_id']
-        # Attempt to delete the LibraryInventory instance
         book = LibraryInventory.objects.filter(id=book_id).first()
         if book:
             book.delete()
             return True
-        return False  # Return False if the book ID is not found
+        return False  
 
 # Library Member Forms
 class AddMemberForm(forms.ModelForm):
-    student_id = forms.IntegerField(label="Student ID")  # Define the student ID as a form field
+    student_id = forms.IntegerField(label="Student ID")  
 
     class Meta:
         model = LibraryMember
-        fields = ['membership_date']  # Exclude 'student' from the form fields
+        fields = ['membership_date'] 
 
     def save(self, commit=True):
         student_id = self.cleaned_data['student_id']
         student = RegisteredStudent.objects.get(id=student_id)
-        self.instance.student = student  # Set the student instance
+        self.instance.member = student  
         return super().save(commit=commit)
 
 class UpdateMemberForm(forms.Form):
@@ -338,20 +336,37 @@ class DeleteStreamCourseForm(forms.Form):
 class AddStudentForm(forms.ModelForm):
     class Meta:
         model = RegisteredStudent
-        fields = ['student_name', 'course', 'admission_date', 'fee_status']  
+        fields = ['student_name', 'course', 'admission_date', 'fee_status']
+        widgets = {
+            'admission_date': forms.DateInput(attrs={'type': 'date'}),
+        }
 
+    # Override the course field to be a checkbox for each StreamCourse
+    course = forms.ModelMultipleChoiceField(
+        queryset=StreamCourse.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=True,
+    )
+
+
+from django import forms
+from .models import RegisteredStudent, StreamCourse
 
 class UpdateStudentForm(forms.Form):
     student_id = forms.IntegerField(label="Student ID")
     new_student_name = forms.CharField(max_length=255, label="New Student Name")
-    new_course = forms.ModelChoiceField(queryset=StreamCourse.objects.all(), label="New Course")
-    new_admission_date = forms.DateField(label="New Admission Date")
+    new_courses = forms.ModelMultipleChoiceField(
+        queryset=StreamCourse.objects.all(),
+        label="New Courses",
+        widget=forms.CheckboxSelectMultiple
+    )
+    new_admission_date = forms.DateField(label="New Admission Date", widget=forms.SelectDateWidget)
     new_fee_status = forms.ChoiceField(choices=[('Paid', 'Paid'), ('Unpaid', 'Unpaid')], label="New Fee Status")
 
     def update_student(self):
         student_id = self.cleaned_data['student_id']
         new_student_name = self.cleaned_data['new_student_name']
-        new_course = self.cleaned_data['new_course']
+        new_courses = self.cleaned_data['new_courses']
         new_admission_date = self.cleaned_data['new_admission_date']
         new_fee_status = self.cleaned_data['new_fee_status']
         
@@ -359,12 +374,16 @@ class UpdateStudentForm(forms.Form):
         student = RegisteredStudent.objects.filter(id=student_id).first()
         if student:
             student.student_name = new_student_name
-            student.course = new_course
             student.admission_date = new_admission_date
             student.fee_status = new_fee_status
             student.save()
+            
+            # Update the courses for the many-to-many relationship
+            student.course.set(new_courses)
+            
             return True
         return False  # Return False if the student ID is not found
+
 
 
 class DeleteStudentForm(forms.Form):
@@ -378,6 +397,158 @@ class DeleteStudentForm(forms.Form):
             return True
         except RegisteredStudent.DoesNotExist:
             return False
+
+
+# Marks Form
+
+
+
+class AddMarksForm(forms.ModelForm):
+    student_id = forms.IntegerField(label="Student ID")
+    faculty_id = forms.IntegerField(label="Faculty ID")
+    course_id = forms.IntegerField(label="Course ID")
+
+    class Meta:
+        model = CourseMarks
+        fields = ['marks']
+
+    def save(self, commit=True):
+        student_id = self.cleaned_data['student_id']
+        faculty_id = self.cleaned_data['faculty_id']
+        course_id = self.cleaned_data['course_id']
+
+        # Fetch the related instances
+        student = RegisteredStudent.objects.get(id=student_id)
+        faculty = Faculty.objects.get(id=faculty_id)
+        course = StreamCourse.objects.get(id=course_id)
+
+        # Validate faculty-course assignment
+        if not FacultyCourseAssignment.objects.filter(faculty=faculty, course=course).exists():
+            raise ValidationError("The specified faculty is not assigned to the specified course.")
+        
+        # Validate student's course
+        if student.course != course:
+            raise ValidationError("The student's course must match the specified course in CourseMarks.")
+
+        # Set the instance values
+        self.instance.student = student
+        self.instance.faculty = faculty
+        self.instance.course = course
+        return super().save(commit=commit)
+
+
+
+
+class UpdateMarksForm(forms.Form):
+    student_id = forms.IntegerField(label="Student ID", required=True)
+    faculty_id = forms.IntegerField(label="Faculty ID", required=True)
+    course = forms.ModelChoiceField(
+        queryset=StreamCourse.objects.all(), 
+        label="Course", 
+        required=True
+    )
+    updated_marks = forms.DecimalField(label="Updated Marks", max_digits=5, decimal_places=2)
+
+    def update_marks(self):
+        student_id = self.cleaned_data['student_id']
+        faculty_id = self.cleaned_data['faculty_id']
+        course = self.cleaned_data['course']
+        updated_marks = self.cleaned_data['updated_marks']
+        
+        # Retrieve the CourseMarks instance based on student_id, faculty_id, and course
+        course_marks = CourseMarks.objects.filter(
+            student_id=student_id,
+            faculty_id=faculty_id,
+            course=course
+        ).first()
+
+        if course_marks:
+            course_marks.marks = updated_marks
+            course_marks.save()
+            return True
+        return False  # Record not found
+
+class DeleteMarksForm(forms.Form):
+    course_marks_id = forms.IntegerField(label="Course Marks ID")
+
+    def delete_course_marks(self):
+        course_marks_id = self.cleaned_data['course_marks_id']
+        course_marks = CourseMarks.objects.filter(id=course_marks_id).first()
+        if course_marks:
+            course_marks.delete()
+            return True
+        return False
+
+from django import forms
+from .models import Faculty, StreamCourse, FacultyCourseAssignment
+
+# Add FacultyCourseAssignment Form
+class AddFacultyCourseAssignmentForm(forms.ModelForm):
+    faculty_id = forms.IntegerField(label="Faculty ID")
+    course_id = forms.IntegerField(label="Course ID")
+
+    class Meta:
+        model = FacultyCourseAssignment
+        fields = []
+
+    def save(self, commit=True):
+        faculty_id = self.cleaned_data['faculty_id']
+        course_id = self.cleaned_data['course_id']
+
+        try:
+            # Fetch related instances with error handling
+            faculty = Faculty.objects.get(id=faculty_id)
+            course = StreamCourse.objects.get(id=course_id)
+
+            # Set the instance values
+            self.instance.faculty = faculty
+            self.instance.course = course
+            return super().save(commit=commit)
+        except (Faculty.DoesNotExist, StreamCourse.DoesNotExist):
+            raise forms.ValidationError("Invalid Faculty ID or Course ID provided.")
+
+# Update FacultyCourseAssignment Form
+class UpdateFacultyCourseAssignmentForm(forms.Form):
+    assignment_id = forms.IntegerField(label="Assignment ID")
+    updated_faculty_id = forms.IntegerField(label="Updated Faculty ID")
+    updated_course_id = forms.IntegerField(label="Updated Course ID")
+
+    def update_assignment(self):
+        assignment_id = self.cleaned_data['assignment_id']
+        updated_faculty_id = self.cleaned_data['updated_faculty_id']
+        updated_course_id = self.cleaned_data['updated_course_id']
+
+        assignment = FacultyCourseAssignment.objects.filter(id=assignment_id).first()
+        if assignment:
+            try:
+                # Fetch the updated faculty and course with error handling
+                faculty = Faculty.objects.get(id=updated_faculty_id)
+                course = StreamCourse.objects.get(id=updated_course_id)
+
+                # Update the assignment fields
+                assignment.faculty = faculty
+                assignment.course = course
+                assignment.save()
+                return True
+            except (Faculty.DoesNotExist, StreamCourse.DoesNotExist):
+                raise forms.ValidationError("Invalid Faculty ID or Course ID provided.")
+        else:
+            raise forms.ValidationError("Assignment ID not found.")
+        return False
+
+# Delete FacultyCourseAssignment Form
+class DeleteFacultyCourseAssignmentForm(forms.Form):
+    assignment_id = forms.IntegerField(label="Assignment ID")
+
+    def delete_assignment(self):
+        assignment_id = self.cleaned_data['assignment_id']
+        assignment = FacultyCourseAssignment.objects.filter(id=assignment_id).first()
+        if assignment:
+            assignment.delete()
+            return True
+        else:
+            raise forms.ValidationError("Assignment ID not found.")
+        return False
 
 
 # Admission Stat Forms
@@ -424,7 +595,7 @@ class DeleteAdmissionForm(forms.Form):
 # Fee Collection Forms
 class AddFeeForm(forms.ModelForm):
     class Meta:
-        model = FeeCollection
+        model = FeeCollection 
         fields = ['student', 'amount', 'date_paid']
 
     
@@ -444,10 +615,8 @@ class UpdateFeeForm(forms.Form):
             # Try to retrieve the FeeCollection instance
             fee = FeeCollection.objects.get(id=fee_id)
 
-            # Look up the RegisteredStudent using the student ID
-            new_student = RegisteredStudent.objects.get(id=new_student_id)  # Ensure the student exists
+            new_student = RegisteredStudent.objects.get(id=new_student_id)  
 
-            # Update fields
             fee.student = new_student
             fee.amount = new_amount
             fee.date_paid = new_date_paid
@@ -456,7 +625,7 @@ class UpdateFeeForm(forms.Form):
         except FeeCollection.DoesNotExist:
             return False
         except RegisteredStudent.DoesNotExist:
-            return False  # Handle the case where the student ID does not exist
+            return False  
 
 class DeleteFeeForm(forms.Form):
     fee_id = forms.IntegerField(label="fee_id")
@@ -472,7 +641,6 @@ class DeleteFeeForm(forms.Form):
 
 
 # News and Notices Management
-
 class AddNewsNoticeForm(forms.ModelForm):
     class Meta:
         model = NewsNotice
@@ -492,7 +660,6 @@ class UpdateNewsNoticeForm(forms.Form):
         new_date_posted = self.cleaned_data['new_date_posted']
         new_posted_by = self.cleaned_data['new_posted_by']
         
-        # Fetch the existing NewsNotice instance
         notice = NewsNotice.objects.filter(id=notice_id).first()
         if notice:
             notice.title = new_title
@@ -501,7 +668,7 @@ class UpdateNewsNoticeForm(forms.Form):
             notice.posted_by = new_posted_by
             notice.save()
             return True
-        return False  # Return False if the notice ID is not found
+        return False
 
 class DeleteNewsNoticeForm(forms.Form):
     notice_id = forms.IntegerField(label="Notice ID")
@@ -513,12 +680,12 @@ class DeleteNewsNoticeForm(forms.Form):
             notice.delete()
             return True
         except NewsNotice.DoesNotExist:
-            return False  # Return False if the notice ID does not exist
+            return False 
 
 class AddDepartmentForm(forms.ModelForm):
     class Meta:
         model = Department
-        fields = ['name', 'description']  # Include fields as required
+        fields = ['name', 'description']
 
 class UpdateDepartmentForm(forms.Form):
     department_id = forms.IntegerField(label="Department ID")
@@ -530,14 +697,13 @@ class UpdateDepartmentForm(forms.Form):
         new_name = self.cleaned_data['new_name']
         new_description = self.cleaned_data['new_description']
         
-        # Fetch the existing Department instance
         department = Department.objects.filter(id=department_id).first()
         if department:
             department.name = new_name
             department.description = new_description
             department.save()
             return True
-        return False  # Return False if the department ID is not found
+        return False 
 
 class DeleteDepartmentForm(forms.Form):
     department_id = forms.IntegerField(label="Department ID")
@@ -549,12 +715,12 @@ class DeleteDepartmentForm(forms.Form):
             department.delete()
             return True
         except Department.DoesNotExist:
-            return False  # Return False if the department ID does not exist 
+            return False 
 
 class AddSliderForm(forms.ModelForm):
     class Meta:
         model = Slider
-        fields = ['image_url', 'caption', 'order']  # Include fields as required
+        fields = ['image_url', 'caption', 'order'] 
 
 class UpdateSliderForm(forms.Form):
     slider_id = forms.IntegerField(label="Slider ID")
@@ -568,7 +734,6 @@ class UpdateSliderForm(forms.Form):
         new_caption = self.cleaned_data['new_caption']
         new_order = self.cleaned_data['new_order']
         
-        # Fetch the existing Slider instance
         slider = Slider.objects.filter(id=slider_id).first()
         if slider:
             slider.image_url = new_image_url
@@ -576,7 +741,7 @@ class UpdateSliderForm(forms.Form):
             slider.order = new_order
             slider.save()
             return True
-        return False  # Return False if the slider ID is not found
+        return False  
 
 class DeleteSliderForm(forms.Form):
     slider_id = forms.IntegerField(label="Slider ID")
@@ -588,11 +753,11 @@ class DeleteSliderForm(forms.Form):
             slider.delete()
             return True
         except Slider.DoesNotExist:
-            return False  # Return False if the slider ID does not exist
+            return False  
 class AddTickerForm(forms.ModelForm):
     class Meta:
         model = Ticker
-        fields = ['message', 'date_created']  # Include fields as required
+        fields = ['message', 'date_created']  
 
 class UpdateTickerForm(forms.Form):
     ticker_id = forms.IntegerField(label="Ticker ID")
@@ -604,14 +769,13 @@ class UpdateTickerForm(forms.Form):
         new_message = self.cleaned_data['new_message']
         new_date = self.cleaned_data['new_date']
         
-        # Fetch the existing Ticker instance
         ticker = Ticker.objects.filter(id=ticker_id).first()
         if ticker:
             ticker.message = new_message
             ticker.date_created = new_date
             ticker.save()
             return True
-        return False  # Return False if the ticker ID is not found
+        return False 
 
 class DeleteTickerForm(forms.Form):
     ticker_id = forms.IntegerField(label="Ticker ID")
@@ -623,7 +787,7 @@ class DeleteTickerForm(forms.Form):
             ticker.delete()
             return True
         except Ticker.DoesNotExist:
-            return False  # Return False if the ticker ID does not exist
+            return False 
 
 class AddImageForm(forms.ModelForm):
     class Meta:
@@ -640,7 +804,6 @@ class UpdateImageForm(forms.Form):
         new_image_url = self.cleaned_data.get('new_image_url')
         new_caption = self.cleaned_data.get('new_caption')
         new_uploaded_by = self.cleaned_data.get('new_uploaded_by')
-        # Fetch the existing ImageGallery instance
         image = ImageGallery.objects.filter(id=image_id).first()
         if image:
             if new_image_url:
@@ -651,7 +814,7 @@ class UpdateImageForm(forms.Form):
                 image.uploaded_by = new_uploaded_by    
             image.save()
             return True
-        return False  # Return False if the image ID is not found
+        return False  
 
 class DeleteImageForm(forms.Form):
     image_id = forms.IntegerField()
@@ -710,7 +873,7 @@ class UpdateFacultyForm(forms.Form):
     faculty_id = forms.IntegerField()
     new_name = forms.CharField(max_length=255)
     new_designation = forms.CharField(max_length=255)
-    new_department = forms.ModelChoiceField(queryset=Department.objects.all())  # Assuming you have a Department model
+    new_department = forms.ModelChoiceField(queryset=Department.objects.all()) 
     new_contact = forms.CharField(max_length=100)
     new_photo_url = forms.CharField(max_length=255)
 
@@ -882,20 +1045,29 @@ class DeleteGrievanceForm(forms.Form):
 
 class AddFeedbackForm(forms.Form):
     student_id = forms.IntegerField()
+    faculty_id = forms.IntegerField()  # New field for faculty ID
     feedback_text = forms.CharField(widget=forms.Textarea)
     submitted_date = forms.DateField()
 
     def save(self):
         student_id = self.cleaned_data['student_id']
+        faculty_id = self.cleaned_data['faculty_id']  # Retrieve faculty_id from cleaned_data
+
         try:
             student = RegisteredStudent.objects.get(id=student_id)
-            feedback = Feedback(student=student, 
-                                feedback_text=self.cleaned_data['feedback_text'], 
-                                submitted_date=self.cleaned_data['submitted_date'])
+            faculty = Faculty.objects.get(id=faculty_id)  # Retrieve Faculty instance by ID
+
+            feedback = Feedback(
+                student=student,
+                faculty=faculty,  # Set the faculty field
+                feedback_text=self.cleaned_data['feedback_text'],
+                submitted_date=self.cleaned_data['submitted_date']
+            )
             feedback.save()
             return True
-        except RegisteredStudent.DoesNotExist:
+        except (RegisteredStudent.DoesNotExist, Faculty.DoesNotExist):
             return False
+
 
 class UpdateFeedbackForm(forms.Form):
     feedback_id = forms.IntegerField()

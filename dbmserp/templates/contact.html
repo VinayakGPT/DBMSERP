@@ -1,21 +1,178 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us</title>
-    <link rel="stylesheet" href="{% static 'style.css' %}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'contact.css' %}">
+  <link
+  href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"
+  rel="stylesheet"
+/>
+
+<!-- Bootstrap Icons CSS -->
+<link
+  href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css"
+  rel="stylesheet"
+/><!-- Link to your CSS file -->
 </head>
 <body>
+      <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="{% static 'images/logo.png' %}" alt="College Logo" />
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}"><i class="bi bi-house-door"></i> <b>Home</b></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'about' %}"><i class="bi bi-info-circle"></i> <b>About</b></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'show_courses' %}"><i class="bi bi-book"></i> <b>Courses</b></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'contact' %}"><i class="bi bi-telephone"></i> <b>Contact Us</b></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-    <div class="container">
-        <h2>Contact Us</h2>
-        <section class="contact-section">
-            <p>We'd love to hear from you! Reach out to us for any inquiries, feedback, or support.</p>
-            
-        </section>
+  <!-- Welcome Heading -->
+  <section class="welcome-heading text-center py-5 bg-light">
+    <h1>Contact Us</h1>
+    <p>We're here to assist you with any questions or information you need.</p>
+  </section>
+
+  <!-- Contact Information Section -->
+  <section class="contact-section text-center py-5">
+    <h2>Get in Touch</h2>
+    <p>If you have any inquiries, feel free to reach out to us through the following channels:</p>
+    <div class="contact-info">
+      <h3>Address:</h3>
+      <p>123 College Avenue, City, State, Zip</p>
+
+      <h3>Phone:</h3>
+      <p>(123) 456-7890</p>
+
+      <h3>Email:</h3>
+      <p><a href="mailto:info@college.edu">info@college.edu</a></p>
     </div>
+  </section>
+<!-- Frequently Asked Questions Section -->
+  <section class="faq-section text-center py-5">
+    <h2>Frequently Asked Questions</h2>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="faq-item">
+            <h3>What is the admission process?</h3>
+            <p>The admission process involves submitting an online application, followed by an entrance test and an interview for eligible candidates.</p>
+          </div>
+          <div class="faq-item">
+            <h3>What are the available courses?</h3>
+            <p>We offer a range of undergraduate and postgraduate courses in science, arts, engineering, and management. Please visit our Courses page for more details.</p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="faq-item">
+            <h3>How can I contact the admissions office?</h3>
+            <p>You can contact the admissions office by phone at (123) 456-7890 or via email at admissions@college.edu.</p>
+          </div>
+          <div class="faq-item">
+            <h3>What are the campus facilities?</h3>
+            <p>Our campus includes libraries, sports complexes, research labs, and student centers. For a full list, please check our Facilities page.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
+
+
+  <!-- Our Team Section -->
+  <section class="about-section text-center py-5 bg-light">
+    <h2>Meet Our Team</h2>
+    <div class="container">
+      <div class="row">
+        <!-- Team Member 1 -->
+        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+          <div class="card team-card">
+            <img src="{% static 'images/Vinayak1.jpg' %}" alt="Dr. Jane Dog" class="card-img-top">
+            <div class="card-body">
+              <h3 class="card-title">Vinayak Gupta</h3>
+              <div class="info-overlay">
+                <p>President</p>
+                <p>Vinayak Gupta leads the institution with a vision of innovation and community engagement.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Team Member 2 -->
+        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+          <div class="card team-card">
+            <img src="{% static 'images/Priyanshu1.jpg' %}" alt="Mr. John Smith" class="card-img-top">
+            <div class="card-body">
+              <h3 class="card-title">Priyanshu Upadhyay</h3>
+              <div class="info-overlay">
+                <p>Dean of Students</p>
+                <p>Priyanshu Upadhyay enhances student life and creates a positive campus environment.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Team Member 3 -->
+        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+          <div class="card team-card">
+            <img src="{% static 'images/Sanskar1.jpg' %}" alt="Dr. Alice Brown" class="card-img-top">
+            <div class="card-body">
+              <h3 class="card-title">Sanskar Bajaj</h3>
+              <div class="info-overlay">
+                <p>Head of Research</p>
+                <p>Sanskar Bajaj oversees research initiatives, fostering a culture of innovation.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Team Member 4 -->
+        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+          <div class="card team-card">
+            <img src="{% static 'images/Astha.jpeg' %}" alt="Ms. Emily White" class="card-img-top">
+            <div class="card-body">
+              <h3 class="card-title">Astha Pathak</h3>
+              <div class="info-overlay">
+                <p>Admissions Director</p>
+                <p>Astha Pathak welcomes students from diverse backgrounds to our college community.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer Section -->
+  <footer class="footer text-center py-4 bg-dark text-white">
+    <div class="container">
+      <p>&copy; 2024 College Name. All Rights Reserved.</p>
+      <p>123 College Avenue, City, State, Zip | Phone: (123) 456-7890 | Email: info@college.edu</p>
+      <a href="#" class="text-warning">Privacy Policy</a> | <a href="#" class="text-warning">Terms of Service</a>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS and dependencies -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

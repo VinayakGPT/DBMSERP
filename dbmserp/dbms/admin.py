@@ -4,9 +4,10 @@ from .models import (
     StreamCourse, RegisteredStudent, AdmissionStat, FeeCollection,
     CertificateType, CertificateApplication,
     LibraryInventory, LibraryMember, LibraryFineCollection, BookIssued,
-    Grievance, Feedback, Enquiry
+    Grievance, Feedback, Enquiry, Profile,CourseMarks,FacultyCourseAssignment,
 )
 
+admin.site.register(Profile)
 # Website Management
 admin.site.register(NewsNotice)
 admin.site.register(Slider)
@@ -38,3 +39,6 @@ admin.site.register(BookIssued)
 admin.site.register(Grievance)
 admin.site.register(Feedback)
 admin.site.register(Enquiry)
+
+admin.site.register(CourseMarks)
+admin.site.register(FacultyCourseAssignment)

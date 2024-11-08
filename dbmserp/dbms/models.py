@@ -1,5 +1,21 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
+
+class Profile(models.Model):
+    ROLE_CHOICES = (
+        ('admin', 'Admin'),
+        ('faculty', 'Faculty'),
+        ('student', 'Student'),
+    )
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
+    faculty_id = models.IntegerField(null=True, blank=True)  # Only for faculty
+    student_id = models.IntegerField(null=True, blank=True)  # Only for students
+
+    def __str__(self):
+        return f"{self.user.username} ({self.role})"
 
 class Department(models.Model):
     id = models.AutoField(primary_key=True)
@@ -71,17 +87,48 @@ class StreamCourse(models.Model):
     course_name = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.course_name
+        return self.course_name 
 
 class RegisteredStudent(models.Model):
     id = models.AutoField(primary_key=True)
     student_name = models.CharField(max_length=255)
-    course = models.ForeignKey(StreamCourse, on_delete=models.CASCADE)  # FK to StreamCourse
+    course = models.ManyToManyField(StreamCourse)  # FK to StreamCourse
     admission_date = models.DateField()
     fee_status = models.CharField(max_length=10, choices=[('Paid', 'Paid'), ('Unpaid', 'Unpaid')])
 
     def __str__(self):
         return self.student_name
+    
+class FacultyCourseAssignment(models.Model):
+    id = models.AutoField(primary_key=True)
+    faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE)
+    course = models.ForeignKey(StreamCourse, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.faculty.name} - {self.course.course_name}"
+
+class CourseMarks(models.Model):
+    id = models.AutoField(primary_key=True)
+    student = models.ForeignKey(RegisteredStudent, on_delete=models.CASCADE)  # FK to RegisteredStudent
+    faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE)  # FK to Faculty
+    course = models.ForeignKey(StreamCourse, on_delete=models.CASCADE)  # FK to StreamCourse
+    marks = models.DecimalField(max_digits=5, decimal_places=2)  # Marks with up to two decimal points
+
+    def save(self, *args, **kwargs):
+        # Validate that the faculty is assigned to the course
+        if not FacultyCourseAssignment.objects.filter(faculty=self.faculty, course=self.course).exists():
+            raise ValidationError("The specified faculty is not assigned to the specified course.")
+
+        # Validate that the student's course includes the specified course
+        if not self.student.course.filter(id=self.course.id).exists():
+            raise ValidationError("The student's course must match the specified course in CourseMarks.")
+
+        super().save(*args, **kwargs)  # Call the original save method
+
+    def __str__(self):
+        return f"{self.student.student_name} - {self.course.course_name} - {self.marks}"
+
+
 
 class AdmissionStat(models.Model):
     id = models.AutoField(primary_key=True)
@@ -132,11 +179,11 @@ class LibraryInventory(models.Model):
 
 class LibraryMember(models.Model):
     id = models.AutoField(primary_key=True)
-    student = models.ForeignKey(RegisteredStudent, on_delete=models.CASCADE)  # FK to RegisteredStudent
+    member = models.ForeignKey(RegisteredStudent, on_delete=models.CASCADE)  # FK to RegisteredStudent
     membership_date = models.DateField()
 
     def __str__(self):
-        return str(self.student)
+        return str(self.member)
 
 class LibraryFineCollection(models.Model):
     id = models.AutoField(primary_key=True)
@@ -178,16 +225,17 @@ class Grievance(models.Model):
     resolved_date = models.DateField(null=True, blank=True)
 
     def __str__(self):
-        return self.student
+        return str(self.student)
 
 class Feedback(models.Model):
     id = models.AutoField(primary_key=True)
     student = models.ForeignKey(RegisteredStudent, on_delete=models.CASCADE)  # FK to RegisteredStudent
+    faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE)  # FK to Faculty
     feedback_text = models.TextField()
     submitted_date = models.DateField()
 
     def __str__(self):
-        return self.student
+        return str(self.student)
 
 class Enquiry(models.Model):
     id = models.AutoField(primary_key=True)

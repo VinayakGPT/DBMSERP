@@ -77,10 +77,10 @@ WSGI_APPLICATION = "dbmserp.wsgi.application"
 
 DATABASES = {
     "default": {
-                            # Default MySQL port
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
-
 
 
 # Password validation

@@ -104,7 +104,7 @@
             <thead> 
                 <tr>
                     <th>Member ID</th>
-                    <th>Student ID</th>
+                    <th>Member Name</th>
                     <th>Membership Date</th>
                 </tr>
             </thead>
@@ -112,7 +112,7 @@
                 {% for member in members %}
                 <tr>
                     <td>{{ member.id }}</td>
-                    <td>{{ member.student_id }}</td>
+                    <td>{{ member.member.student_name }}</td>
                     <td>{{ member.membership_date }}</td>
                 </tr>
                 {% endfor %}
