@@ -1,21 +1,20 @@
-{%load static%}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Member List</title>
+    <title>Course Assignments</title>
     <link rel="icon" href="{% static 'images/logo.png' %}" type="image/x-icon" />
     <link href="https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="{% static 'lib.css' %}" />
+    <link rel="stylesheet" href="{% static 'style.css' %}">
     <style>
-        /* Additional styling for table */
         .container {
             max-width: 1200px;
             margin: 50px auto;
-            padding: 20px; 
+            padding: 20px;
             background-color: #ffffff;
             border-radius: 12px;
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
@@ -30,36 +29,23 @@
             text-align: left;
             background-color: #f4f6f9;
         }
-
         .table th, .table td {
             padding: 12px 15px;
             border-bottom: 1px solid #ddd;
         }
-
         .table th {
             background-color: #02012f;
             color: #ffffff;
             font-weight: 700;
             text-transform: uppercase;
         }
-
         .table tbody tr:nth-child(even) {
             background-color: #f9f9f9;
         }
-
         .table tbody tr:hover {
             background-color: #e0e4f1;
             transition: background-color 0.3s ease;
         }
-
-        /* Image styling for faculty photos */
-        .table img {
-            display: block;
-            margin: 0 auto;
-            border-radius: 50%;
-        }
-
-        /* Heading styling */
         h2 {
             text-align: center;
             color: #010050;
@@ -70,7 +56,6 @@
     </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">
@@ -99,21 +84,21 @@
         </div>
     </nav>
     <div class="container">
-        <h2>Library Members</h2>
+        <h2>Course Assignments</h2>
         <table class="table">
             <thead> 
                 <tr>
-                    <th>Member ID</th>
-                    <th>Member Name</th>
-                    <th>Membership Date</th>
+                    <th>Assignment ID</th>
+                    <th>Faculty ID</th>
+                    <th>Course Name</th>
                 </tr>
             </thead>
             <tbody>
-                {% for member in members %}
+                {% for assignment in assignments %}
                 <tr>
-                    <td>{{ member.id }}</td>
-                    <td>{{ member.student.student_name }}</td>
-                    <td>{{ member.membership_date }}</td>
+                    <td>{{ assignment.id }}</td>
+                    <td>{{ assignment.faculty.id }}</td>
+                    <td>{{ assignment.course.course_name }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

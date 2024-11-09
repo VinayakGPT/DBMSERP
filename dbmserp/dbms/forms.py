@@ -403,152 +403,222 @@ class DeleteStudentForm(forms.Form):
 
 
 
+
+
+from django import forms
+from .models import CourseMarks, FacultyCourseAssignment, RegisteredStudent, StreamCourse
+from django.core.exceptions import ValidationError
+
 class AddMarksForm(forms.ModelForm):
-    student_id = forms.IntegerField(label="Student ID")
-    faculty_id = forms.IntegerField(label="Faculty ID")
-    course_id = forms.IntegerField(label="Course ID")
+    student_id = forms.IntegerField(
+        label="Student ID", 
+        required=True, 
+        widget=forms.NumberInput(attrs={'class': 'form-control'})
+    )
 
     class Meta:
         model = CourseMarks
-        fields = ['marks']
+        fields = ['course', 'marks']  # Exclude 'faculty' since it will be set automatically
+
+    def __init__(self, *args, **kwargs):
+        # Capture the faculty parameter passed from the view
+        faculty = kwargs.pop('faculty', None)
+        super(AddMarksForm, self).__init__(*args, **kwargs)
+
+        # Filter courses based on the logged-in faculty’s assigned courses
+        if faculty:
+            assigned_courses = FacultyCourseAssignment.objects.filter(faculty=faculty).values_list('course', flat=True)
+            self.fields['course'].queryset = StreamCourse.objects.filter(id__in=assigned_courses)
+        
+        # Update field attributes
+        self.fields['course'].widget.attrs.update({'class': 'form-control'})
+        self.fields['marks'].widget.attrs.update({'class': 'form-control'})
+
+    def clean_student_id(self):
+        student_id = self.cleaned_data.get('student_id')
+        try:
+            # Ensure student exists
+            student = RegisteredStudent.objects.get(id=student_id)
+            self.cleaned_data['student'] = student  # Store student instance in cleaned data
+        except RegisteredStudent.DoesNotExist:
+            raise ValidationError("Student with this ID does not exist.")
+        return student_id
 
     def save(self, commit=True):
-        student_id = self.cleaned_data['student_id']
-        faculty_id = self.cleaned_data['faculty_id']
-        course_id = self.cleaned_data['course_id']
-
-        # Fetch the related instances
-        student = RegisteredStudent.objects.get(id=student_id)
-        faculty = Faculty.objects.get(id=faculty_id)
-        course = StreamCourse.objects.get(id=course_id)
-
-        # Validate faculty-course assignment
-        if not FacultyCourseAssignment.objects.filter(faculty=faculty, course=course).exists():
-            raise ValidationError("The specified faculty is not assigned to the specified course.")
-        
-        # Validate student's course
-        if student.course != course:
-            raise ValidationError("The student's course must match the specified course in CourseMarks.")
-
-        # Set the instance values
-        self.instance.student = student
-        self.instance.faculty = faculty
-        self.instance.course = course
-        return super().save(commit=commit)
+        instance = super().save(commit=False)
+        instance.student = self.cleaned_data.get('student')
+        if commit:
+            instance.save()
+        return instance
 
 
 
 
 class UpdateMarksForm(forms.Form):
-    student_id = forms.IntegerField(label="Student ID", required=True)
-    faculty_id = forms.IntegerField(label="Faculty ID", required=True)
-    course = forms.ModelChoiceField(
-        queryset=StreamCourse.objects.all(), 
-        label="Course", 
+    marks_id = forms.IntegerField(
+        label="Marks ID", 
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter Marks ID'}),
         required=True
     )
-    updated_marks = forms.DecimalField(label="Updated Marks", max_digits=5, decimal_places=2)
+    marks = forms.DecimalField(
+        label="Marks", 
+        max_digits=5, 
+        decimal_places=2,
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter Marks'}),
+        required=True
+    )
+    course = forms.ModelChoiceField(
+        queryset=None,  # To be set in __init__
+        label="Course",
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=True
+    )
+
+    class Meta:
+        model = CourseMarks
+        fields = ['marks_id', 'course', 'marks']
+
+    def __init__(self, *args, **kwargs):
+        faculty = kwargs.pop('faculty', None)  # Expecting a faculty instance to be passed in
+        super(UpdateMarksForm, self).__init__(*args, **kwargs)
+
+        # Filter courses by the ones assigned to the faculty
+        if faculty:
+            assigned_courses = FacultyCourseAssignment.objects.filter(faculty=faculty).values_list('course', flat=True)
+            self.fields['course'].queryset = StreamCourse.objects.filter(id__in=assigned_courses)
+
+        # Add CSS classes
+        self.fields['marks'].widget.attrs.update({'class': 'form-control'})
 
     def update_marks(self):
-        student_id = self.cleaned_data['student_id']
-        faculty_id = self.cleaned_data['faculty_id']
-        course = self.cleaned_data['course']
-        updated_marks = self.cleaned_data['updated_marks']
-        
-        # Retrieve the CourseMarks instance based on student_id, faculty_id, and course
-        course_marks = CourseMarks.objects.filter(
-            student_id=student_id,
-            faculty_id=faculty_id,
-            course=course
-        ).first()
+        # Get the cleaned data from the form
+        marks_id = self.cleaned_data.get('marks_id')
+        marks = self.cleaned_data.get('marks')
+        course = self.cleaned_data.get('course')
 
-        if course_marks:
-            course_marks.marks = updated_marks
-            course_marks.save()
-            return True
-        return False  # Record not found
+        # Try to find the CourseMarks object
+        try:
+            course_marks = CourseMarks.objects.get(id=marks_id)
+        except CourseMarks.DoesNotExist:
+            self.add_error('marks_id', "Marks ID not found.")
+            return False
+
+        # Update the course marks record
+        course_marks.marks = marks
+        course_marks.course = course
+        course_marks.save()
+
+        return True
+from django import forms
+from .models import CourseMarks
 
 class DeleteMarksForm(forms.Form):
-    course_marks_id = forms.IntegerField(label="Course Marks ID")
+    marks_id = forms.IntegerField(
+        label="Marks ID", 
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter Marks ID'}),
+        required=True
+    )
 
-    def delete_course_marks(self):
-        course_marks_id = self.cleaned_data['course_marks_id']
-        course_marks = CourseMarks.objects.filter(id=course_marks_id).first()
-        if course_marks:
-            course_marks.delete()
-            return True
-        return False
+    class Meta:
+        model = CourseMarks
+        fields = ['marks_id']
+
+    def delete_marks(self):
+        # Get the cleaned data from the form
+        marks_id = self.cleaned_data.get('marks_id')
+
+        # Try to find the CourseMarks object
+        try:
+            course_marks = CourseMarks.objects.get(id=marks_id)
+        except CourseMarks.DoesNotExist:
+            self.add_error('marks_id', "Marks ID not found.")
+            return False
+
+        # Delete the CourseMarks record
+        course_marks.delete()
+
+        return True
+
 
 from django import forms
 from .models import Faculty, StreamCourse, FacultyCourseAssignment
 
-# Add FacultyCourseAssignment Form
 class AddFacultyCourseAssignmentForm(forms.ModelForm):
     faculty_id = forms.IntegerField(label="Faculty ID")
     course_id = forms.IntegerField(label="Course ID")
 
     class Meta:
         model = FacultyCourseAssignment
-        fields = []
+        fields = []  # Keep fields empty to handle them manually
 
     def save(self, commit=True):
         faculty_id = self.cleaned_data['faculty_id']
         course_id = self.cleaned_data['course_id']
 
         try:
-            # Fetch related instances with error handling
+            # Fetch the related instances
             faculty = Faculty.objects.get(id=faculty_id)
             course = StreamCourse.objects.get(id=course_id)
 
-            # Set the instance values
-            self.instance.faculty = faculty
-            self.instance.course = course
-            return super().save(commit=commit)
-        except (Faculty.DoesNotExist, StreamCourse.DoesNotExist):
-            raise forms.ValidationError("Invalid Faculty ID or Course ID provided.")
+            # Create a new FacultyCourseAssignment instance and assign values
+            assignment = FacultyCourseAssignment(faculty=faculty, course=course)
+            if commit:
+                assignment.save()
+            return assignment
+        except Faculty.DoesNotExist:
+            raise forms.ValidationError("Invalid Faculty ID provided.")
+        except StreamCourse.DoesNotExist:
+            raise forms.ValidationError("Invalid Course ID provided.")
 
-# Update FacultyCourseAssignment Form
 class UpdateFacultyCourseAssignmentForm(forms.Form):
     assignment_id = forms.IntegerField(label="Assignment ID")
     updated_faculty_id = forms.IntegerField(label="Updated Faculty ID")
     updated_course_id = forms.IntegerField(label="Updated Course ID")
 
     def update_assignment(self):
-        assignment_id = self.cleaned_data['assignment_id']
-        updated_faculty_id = self.cleaned_data['updated_faculty_id']
-        updated_course_id = self.cleaned_data['updated_course_id']
+        assignment_id = self.cleaned_data.get('assignment_id')
+        updated_faculty_id = self.cleaned_data.get('updated_faculty_id')
+        updated_course_id = self.cleaned_data.get('updated_course_id')
 
+        # Find the assignment by ID
         assignment = FacultyCourseAssignment.objects.filter(id=assignment_id).first()
-        if assignment:
-            try:
-                # Fetch the updated faculty and course with error handling
-                faculty = Faculty.objects.get(id=updated_faculty_id)
-                course = StreamCourse.objects.get(id=updated_course_id)
+        if not assignment:
+            self.add_error('assignment_id', "Assignment ID not found.")
+            return False
 
-                # Update the assignment fields
-                assignment.faculty = faculty
-                assignment.course = course
-                assignment.save()
-                return True
-            except (Faculty.DoesNotExist, StreamCourse.DoesNotExist):
-                raise forms.ValidationError("Invalid Faculty ID or Course ID provided.")
-        else:
-            raise forms.ValidationError("Assignment ID not found.")
-        return False
+        # Fetch updated faculty and course objects with error handling
+        try:
+            faculty = Faculty.objects.get(id=updated_faculty_id)
+        except Faculty.DoesNotExist:
+            self.add_error('updated_faculty_id', "Invalid Faculty ID provided.")
+            return False
+
+        try:
+            course = StreamCourse.objects.get(id=updated_course_id)
+        except StreamCourse.DoesNotExist:
+            self.add_error('updated_course_id', "Invalid Course ID provided.")
+            return False
+
+        # Update the assignment with the fetched faculty and course
+        assignment.faculty = faculty
+        assignment.course = course
+        assignment.save()
+        return True
 
 # Delete FacultyCourseAssignment Form
 class DeleteFacultyCourseAssignmentForm(forms.Form):
     assignment_id = forms.IntegerField(label="Assignment ID")
 
     def delete_assignment(self):
-        assignment_id = self.cleaned_data['assignment_id']
+        assignment_id = self.cleaned_data.get('assignment_id')
+        # Check if the assignment exists and delete it if found
         assignment = FacultyCourseAssignment.objects.filter(id=assignment_id).first()
         if assignment:
             assignment.delete()
             return True
         else:
-            raise forms.ValidationError("Assignment ID not found.")
-        return False
+            self.add_error('assignment_id', "Assignment with the provided ID does not exist.")
+            return False
 
 
 # Admission Stat Forms

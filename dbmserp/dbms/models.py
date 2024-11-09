@@ -125,9 +125,8 @@ class CourseMarks(models.Model):
 
         super().save(*args, **kwargs)  # Call the original save method
 
-    def __str__(self):
+    def _str_(self):
         return f"{self.student.student_name} - {self.course.course_name} - {self.marks}"
-
 
 
 class AdmissionStat(models.Model):
@@ -179,11 +178,11 @@ class LibraryInventory(models.Model):
 
 class LibraryMember(models.Model):
     id = models.AutoField(primary_key=True)
-    member = models.ForeignKey(RegisteredStudent, on_delete=models.CASCADE)  # FK to RegisteredStudent
+    student = models.ForeignKey(RegisteredStudent, on_delete=models.CASCADE)  # FK to RegisteredStudent
     membership_date = models.DateField()
 
     def __str__(self):
-        return str(self.member)
+        return str(self.student)
 
 class LibraryFineCollection(models.Model):
     id = models.AutoField(primary_key=True)

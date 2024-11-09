@@ -578,7 +578,8 @@ def website_management_view(request):
     faculties = Faculty.objects.all()  # Fetch all faculty records
     departments = Department.objects.all()  # Fetch all departments for the dropdown
     total_faculty = faculties.count()
-    
+    teacher_assign = FacultyCourseAssignment.objects.all()
+    total_assign = teacher_assign.count()
     # Initialize forms and context with data
     context = {
         'add_news_form': AddNewsNoticeForm(),
@@ -625,6 +626,7 @@ def website_management_view(request):
         'faculties': faculties,
         'departments': departments,
         'total_faculty': total_faculty,
+        'total_assign':total_assign,
         'add_faculty_course_assignment_form': AddFacultyCourseAssignmentForm(),
         'update_faculty_course_assignment_form': UpdateFacultyCourseAssignmentForm(),
         'delete_faculty_course_assignment_form': DeleteFacultyCourseAssignmentForm(),
@@ -801,31 +803,42 @@ def website_management_view(request):
                 except Faculty.DoesNotExist:
                     messages.error(request, 'Faculty with the provided ID does not exist.')
 
-        elif 'add_faculty_course_assignment' in request.POST :
-                    form.save()
-                    messages.success(request, 'Faculty-course assignment added successfully.')
+        elif 'add_assignment' in request.POST:
+            form = AddFacultyCourseAssignmentForm(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Faculty-course assignment added successfully.')
+            else:
+                messages.error(request, 'Invalid data provided. Please check faculty and course IDs.')
 
-        elif 'update_faculty_course_assignment' in request.POST:
-                    if form.update_faculty_course_assignment():
-                        messages.success(request, 'Faculty-course assignment updated successfully.')
-                    else:
-                        messages.error(request, 'Invalid faculty-course assignment ID.')
 
-        elif 'delete_faculty_course_assignment' in request.POST:
-                    assignment_id = form.cleaned_data.get('assignment_id')
-                    try:
-                        assignment = FacultyCourseAssignment.objects.get(id=assignment_id)
-                        assignment.delete()
-                        messages.success(request, 'Faculty-course assignment deleted successfully.')
-                    except FacultyCourseAssignment.DoesNotExist:
-                        messages.error(request, 'Assignment with the provided ID does not exist.')
+        elif 'update_assignment' in request.POST:
+            form = UpdateFacultyCourseAssignmentForm(request.POST)
+            if form.is_valid():  # Validate form data before updating
+                if form.update_assignment():
+                    messages.success(request, 'Faculty-course assignment updated successfully.')
+                else:
+                    messages.error(request, 'Invalid faculty-course assignment ID.')
+            else:
+                messages.error(request, 'Invalid data provided. Please check the form fields.')
 
-        return redirect('/faculty_course_assignment/')  # Use a nam
+        elif 'delete_assignment' in request.POST:
+            form = DeleteFacultyCourseAssignmentForm(request.POST)
+            if form.is_valid():
+                if form.delete_assignment():
+                    messages.success(request, 'Faculty-course assignment deleted successfully.')
+                else:
+                    messages.error(request, 'Assignment with the provided ID does not exist.')
+            else:
+                messages.error(request, 'Invalid data provided. Please check the form fields.')
+
+       
         # Redirect to the management page after any form submission
         return redirect('/management/')
 
     # Render the management template with context data
     return render(request, 'management.html', context)
+
 
 
 # Management View
@@ -926,6 +939,10 @@ def feedback_list(request):
     feedbacks = Feedback.objects.all()
     return render(request, 'feedback_list.html', {'feedbacks': feedbacks})
 
+def course_list(request):
+    courses = Feedback.objects.all()
+    return render(request, 'course_list.html', {'courses': courses})
+
 # Student Management
 def student_list(request):
     students = RegisteredStudent.objects.all()
@@ -960,7 +977,10 @@ class CustomLoginView(LoginView):
             return redirect(reverse('home'))  # Replace with a default page URL
         
         return super().form_valid(form)
-    
+
+def show_assignment(request):
+    assignments = FacultyCourseAssignment.objects.select_related('faculty', 'course').all()
+    return render(request, 'show_assignment.html', {'assignments': assignments})    
 def show_students(request):
     students = RegisteredStudent.objects.all().prefetch_related('course')  # Retrieve all students and prefetch related courses
     context = {
@@ -1113,6 +1133,7 @@ from django.shortcuts import render
 from .models import Profile, RegisteredStudent, CourseMarks, AdmissionStat, FeeCollection
 
 def s_student_view(request):
+    course_count = 0
     # Get the profile of the logged-in user
     profile = Profile.objects.filter(user=request.user).first()
 
@@ -1124,6 +1145,7 @@ def s_student_view(request):
         marks = CourseMarks.objects.filter(student=student)  # Filter marks for the specific student
         marks_count = marks.count()  # Get the count of marks entries for this student
         admissions = AdmissionStat.objects.filter(course__id__in=[course.id for course in student.course.all()])
+        course_count = student.course.count()
         fees = FeeCollection.objects.filter(student=student)
     else:
         student = None
@@ -1137,7 +1159,8 @@ def s_student_view(request):
         'marks': marks,
         'admissions': admissions,
         'fees': fees,
-        'marks_count': marks_count
+        'marks_count': marks_count,
+        'course_count':course_count,
     }
 
     return render(request, 's_student.html', context)
@@ -1199,6 +1222,7 @@ def s_show_marks(request):
     return render(request, 's_show_marks.html', context)
 
 
+from django.core.exceptions import ObjectDoesNotExist
 
 def s_issued_books_view(request):
     # Get the profile of the logged-in user
@@ -1211,7 +1235,7 @@ def s_issued_books_view(request):
             registered_student = RegisteredStudent.objects.get(id=profile.student_id)
 
             # Fetch the LibraryMember entry for this RegisteredStudent
-            library_member = LibraryMember.objects.get(member=registered_student)
+            library_member = LibraryMember.objects.get(student=registered_student)
             
             # Filter BookIssued records for this specific LibraryMember
             issued_books = BookIssued.objects.filter(student=library_member)
@@ -1263,7 +1287,7 @@ def s_library_management_view(request):
         # Use student_id from Profile model to get RegisteredStudent
         try:
             registered_student = RegisteredStudent.objects.get(id=profile.student_id)
-            library_member = LibraryMember.objects.filter(member=registered_student).first()
+            library_member = LibraryMember.objects.filter(student=registered_student).first()
             
             if library_member:
                 # Fetch issued books and fines for the library member
@@ -1322,9 +1346,23 @@ def s_library_management_view(request):
     return render(request, 's_library.html', context)
 
 def s_feedback_view(request):
-    grievance_count = Grievance.objects.count()
-    feedback_count = Feedback.objects.count()
-    enquiry_count = Enquiry.objects.count()
+    profile = Profile.objects.filter(user=request.user).first()
+
+    # Initialize data variables for the context
+    student_feedbacks = None
+    total_feedbacks = 0
+
+    # Check if the logged-in user is a student
+    if profile and profile.role == 'student':
+        # Use student_id from Profile model to get RegisteredStudent
+        try:
+            registered_student = RegisteredStudent.objects.get(id=profile.student_id)
+
+            # Fetch feedbacks for the logged-in student
+            student_feedbacks = Feedback.objects.filter(student=registered_student)
+            total_feedbacks = student_feedbacks.count()  # Count the feedback entries
+        except RegisteredStudent.DoesNotExist:
+            messages.error(request, "Registered student profile not found.")    
     # Initialize all forms
     context = {
         'add_grievance_form': AddGrievanceForm(),
@@ -1336,9 +1374,9 @@ def s_feedback_view(request):
         'add_enquiry_form': AddEnquiryForm(),
         'update_enquiry_form': UpdateEnquiryForm(),
         'delete_enquiry_form': DeleteEnquiryForm(),
-        'grievance_count': grievance_count,
-        'feedback_count': feedback_count,
-        'enquiry_count': enquiry_count,
+        
+        'feedback_count': total_feedbacks,
+       
     }
 
     # Process form submissions
@@ -1441,12 +1479,36 @@ def s_feedback_view(request):
     return render(request, 's_feedback.html', context)
 
 
+@login_required
+def f_show_marks(request): 
+    user_profile = Profile.objects.get(user=request.user)
+    
+    # Ensure the user is a faculty member
+    if user_profile.role != 'faculty' or user_profile.faculty_id is None:
+        return render(request, 'error_page.html', {'message': 'Access Denied. Faculty-only page.'})
+
+    faculty_id = user_profile.faculty_id
+    # Get the courses assigned to this faculty
+    assigned_courses = FacultyCourseAssignment.objects.filter(faculty_id=faculty_id).values_list('course_id', flat=True)
+
+    # Fetch marks for students in these courses and assigned to this faculty
+    marks_data = CourseMarks.objects.filter(faculty_id=faculty_id, course_id__in=assigned_courses)
+
+    return render(request, 'f_show_marks.html', {
+        'marks_data': marks_data,
+        'marks_count': marks_data.count()
+    })
+
 def f_student_view(request):
-    courses = StreamCourse.objects.all()
+    user_profile = Profile.objects.get(user=request.user)
+    faculty_id = user_profile.faculty_id  #
+
+    courses = StreamCourse.objects.filter(facultycourseassignment__faculty_id=faculty_id)
     student_count = RegisteredStudent.objects.count()
-    course_count = StreamCourse.objects.count()
+    course_count =courses.count()
     admission_count = AdmissionStat.objects.count()
     fee_count = FeeCollection.objects.count()
+    mark_count = CourseMarks.objects.filter(faculty_id=faculty_id).count()
     # Initialize all forms
     context = {
         'add_student_form': AddStudentForm(),
@@ -1466,9 +1528,12 @@ def f_student_view(request):
         'admission_count': admission_count,
         'course_count': course_count,
         'fee_count': fee_count,
+        'mark_count':mark_count,
         'students': RegisteredStudent.objects.all(),
         'admissions': AdmissionStat.objects.all(),
         'fees': FeeCollection.objects.all(),
+        'marks': CourseMarks.objects.all(), 
+
     }
 
     # Process form submissions
@@ -1518,55 +1583,7 @@ def f_student_view(request):
                         except RegisteredStudent.DoesNotExist:
                             messages.error(request, 'Student with the provided ID does not exist.')
 
-                elif key == 'add_admission':
-                    form.save()
-                    messages.success(request, 'Admission added successfully.')
-
-                elif key == 'update_admission':
-                    update_admission_form = forms['update_admission']
-                    if update_admission_form.is_valid():
-                        if update_admission_form.update_admission():
-                            messages.success(request, 'admission updated successfully.')
-                        else:
-                            messages.error(request, 'Invalid admission ID.')
-
-                elif key == 'delete_admission':
-                    delete_admission_form = forms['delete_admission']
-                    if delete_admission_form.is_valid():
-                        admission_id = delete_admission_form.cleaned_data.get('admission_id')
-                        try:
-                            admission = AdmissionStat.objects.get(id=admission_id)
-                            admission.delete()
-                            messages.success(request, "Admission deleted successfully!")
-                        except AdmissionStat.DoesNotExist:
-                            messages.error(request, "Admission ID not found.")
-            
-
-                elif key == 'add_fee':
-                    form.save()
-                    messages.success(request, 'Fee added successfully.')     
-
-                elif key == 'update_fee':
-                    update_fee_form = forms['update_fee']
-                    if update_fee_form.is_valid():
-                        if update_fee_form.update_fee():
-                            messages.success(request, 'Fee updated successfully.')
-                        else:
-                            messages.error(request, 'Invalid fee ID or Student ID.')
-
-                elif key == 'delete_fee':
-                    delete_fee_form = forms['delete_fee']
-                    if delete_fee_form.is_valid():
-                        try:
-                            fee_id = delete_fee_form.cleaned_data.get('fee_id')
-                            fee = get_object_or_404(FeeCollection, id=fee_id)
-                            fee.delete()
-                            messages.success(request, "Fee deleted successfully!")
-                        except :
-                            messages.error(request,"Fee ID not found")
-                    else :
-                        messages.error(request,"Fee ID not found")
-
+                
                 elif key == "add_course":
                     form.save()
                     messages.success(request, 'Course added successfully.')
@@ -1590,7 +1607,6 @@ def f_student_view(request):
                         except StreamCourse.DoesNotExist:
                             messages.error(request, "Course not found.")
                 
-
                 return redirect('/f_student/')  # Use a named URL for better maintainability
 
    
@@ -1602,6 +1618,7 @@ def f_library_management_view(request):
     member_count = LibraryMember.objects.count()
     total_fines = LibraryFineCollection.objects.aggregate(total_collected=Sum('amount'))['total_collected'] or 0
     total_issued_books = BookIssued.objects.count()
+    
     
     # Initialize forms and context
     context = {
@@ -1864,73 +1881,93 @@ def f_feedback_view(request):
 
     return render(request, 'f_feedback.html', context)
 
-def f_add_marks(request):
-    if request.method == "POST":
-        student_id = request.POST.get("student")
-        course_id = request.POST.get("course")
-        marks = request.POST.get("marks")
-        
-        student = RegisteredStudent.objects.get(id=student_id)
-        course = StreamCourse.objects.get(id=course_id)
 
-        # Create and save a new Marks entry
-        CourseMarks.objects.create(student=student, course=course, marks=marks)
-        
-        messages.success(request, "Marks added successfully!")
-        return redirect('manage_marks')  # Redirect to the manage marks page
 
-    # For GET requests, send necessary context (students and courses)
-    students = RegisteredStudent.objects.all()
-    courses = StreamCourse.objects.all()
-    
-    return render(request, 'f_student.html', {
-        'students': students,
-        'courses': courses
-    })
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import AddMarksForm
+from .models import Profile
 
-# Update Marks View
-def f_update_marks(request):
-    if request.method == "POST":
-        marks_id = request.POST.get("marks_id")
-        new_marks = request.POST.get("new_marks")
-        
-        # Get the Marks object and update the marks field
-        try:
-            marks_entry = CourseMarks.objects.get(id=marks_id)
-            marks_entry.marks = new_marks
-            marks_entry.save()
+def add_marks(request):
+    # Ensure the logged-in user is a faculty member
+    if not request.user.is_authenticated or request.user.profile.role != 'faculty':
+        return redirect('login')  # Redirect to login if not a faculty member
+
+    # Get the faculty instance based on the logged-in user’s profile
+    faculty_id = request.user.profile.faculty_id
+    faculty = get_object_or_404(Faculty, id=faculty_id)
+
+    if request.method == 'POST':
+        form = AddMarksForm(request.POST, faculty=faculty)  # Pass faculty to the form
+        if form.is_valid():
+            # Automatically set the faculty field in CourseMarks instance
+            course_marks = form.save(commit=False)
+            course_marks.faculty = faculty
+            course_marks.save()
+            messages.success(request, "Marks added successfully!")
+            return redirect('add_marks') 
+             # Redirect after successful submission
+    else:
+        form = AddMarksForm(faculty=faculty)  # Initialize form with faculty for GET request
+
+    return render(request, 'add_marks.html', {'form': form})
+
+
+
+def update_marks(request):
+    # Ensure the logged-in user is a faculty member
+    if not request.user.is_authenticated or request.user.profile.role != 'faculty':
+        return redirect('login')
+
+    # Retrieve faculty_id and get the corresponding Faculty instance
+    faculty_id = request.user.profile.faculty_id
+    faculty = get_object_or_404(Faculty, id=faculty_id)
+
+    # Handle the form submission
+    if request.method == 'POST':
+        form = UpdateMarksForm(request.POST, faculty=faculty)
+
+        if form.is_valid():
+            marks_id = form.cleaned_data.get('marks_id')  # Retrieve the marks_id from the form
+            # Get the specific CourseMarks record based on the marks_id
+            try:
+                course_marks = CourseMarks.objects.get(id=marks_id)
+            except CourseMarks.DoesNotExist:
+                messages.error(request, "Marks record not found.")
+                return redirect('update_marks')  # Redirect to an appropriate fallback page
+
+            # Ensure the course in the CourseMarks belongs to the current faculty
+            
+
+            # Update the CourseMarks record with the new data
+            course_marks.marks = form.cleaned_data['marks']
+            course_marks.course = form.cleaned_data['course']
+            course_marks.save()
+
             messages.success(request, "Marks updated successfully!")
-        except CourseMarks.DoesNotExist:
-            messages.error(request, "Marks entry not found.")
-        
-        return redirect('manage_marks')
+            return redirect('update_marks')  # Redirect to an appropriate page after success
+    else:
+        form = UpdateMarksForm(faculty=faculty)  # Initialize the form with the faculty context
 
-    return render(request, 'f_student.html')
+    return render(request, 'update_marks.html', {'form': form})
 
 # Delete Marks View
-def f_delete_marks(request):
-    if request.method == "POST":
-        marks_id = request.POST.get("marks_id")
-        
-        # Delete the Marks entry
-        try:
-            marks_entry = CourseMarks.objects.get(id=marks_id)
-            marks_entry.delete()
-            messages.success(request, "Marks deleted successfully!")
-        except CourseMarks.DoesNotExist:
-            messages.error(request, "Marks entry not found.")
-        
-        return redirect('manage_marks')
+def delete_marks(request):
+    if request.method == 'POST':
+        form = DeleteMarksForm(request.POST)
 
-    return render(request, 'f_student.html')
+        if form.is_valid():
+            if form.delete_marks():
+                messages.success(request, "Marks deleted successfully!")
+                return redirect('delete_marks')  # Redirect to an appropriate page after success
+            else:
+                messages.error(request, "There was an issue with deleting the marks.")
+        else:
+            messages.error(request, "There were errors in the form.")
+    else:
+        form = DeleteMarksForm()
 
-# Show Marks View
-def f_show_marks(request):
-    marks_entries = CourseMarks.objects.all()
-    
-    return render(request, 'f_show_marks.html', {
-        'marks_entries': marks_entries
-    })
+    return render(request, 'delete_marks.html', {'form': form})
     
 @login_required
 def f_show_feedback(request):

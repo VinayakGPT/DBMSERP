@@ -426,7 +426,7 @@ rel="stylesheet"
             <p class="card-text">Manage faculty-course assignments in the system.</p>
 
             <!-- Display total assignments count -->
-            <p class="card-text"><strong>Total Assignments:</strong> {{ total_assignments }}</p>
+            <p class="card-text"><strong>Total Assignments:</strong> {{ total_assign }}</p>
 
             <div class="dropdown">
                 <button class="btn btn-danger dropdown-toggle" type="button" id="assignmentDropdown"
@@ -453,7 +453,7 @@ rel="stylesheet"
                         </button>
                     </li>
                     <!-- Show Data Button -->
-                    <li><a href="{% url 'show_assignments' %}" class="dropdown-item">Show Data</a></li>
+                    <li><a href="{% url 'show_assignment' %}" class="dropdown-item">Show Data</a></li>
                 </ul>
             </div>
 
@@ -463,54 +463,43 @@ rel="stylesheet"
                     {% csrf_token %}
                     <h6>Add Faculty-Course Assignment</h6>
                     <div class="mb-3">
-                        <label for="faculty" class="form-label">Select Faculty</label>
-                        <select class="form-select" name="faculty" required>
-                            {% for faculty in faculty_list %}
-                                <option value="{{ faculty.id }}">{{ faculty.name }}</option>
-                            {% endfor %}
-                        </select>
+                        <input type="number" class="form-control" id="faculty_id" name="faculty_id" placeholder="Enter Faculty ID" required />
                     </div>
                     <div class="mb-3">
                         <label for="course" class="form-label">Select Course</label>
-                        <select class="form-select" name="course" required>
-                            {% for course in course_list %}
+                        <select class="form-select" name="course_id" required>
+                            {% for course in courses %}
                                 <option value="{{ course.id }}">{{ course.course_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <button type="submit" class="btn btn-danger" name="add_assignment">Add Assignment</button>
                 </form>
+                
             </div>
 
-            <!-- Update Assignment Form -->
-            <div class="form-section collapse" id="updateAssignment">
-                <form id="updateAssignmentForm" method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <h6>Update Faculty-Course Assignment</h6>
-                    <div class="mb-3">
-                        <input type="text" class="form-control" name="assignment_id"
-                            placeholder="Assignment ID" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="faculty" class="form-label">New Faculty</label>
-                        <select class="form-select" name="new_faculty" required>
-                            {% for faculty in faculty_list %}
-                                <option value="{{ faculty.id }}">{{ faculty.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="course" class="form-label">New Course</label>
-                        <select class="form-select" name="new_course" required>
-                            {% for course in course_list %}
-                                <option value="{{ course.id }}">{{ course.course_name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-danger" name="update_assignment">Update Assignment</button>
-                </form>
-            </div>
-
+           <!-- Update Assignment Form -->
+<div class="form-section collapse" id="updateAssignment">
+    <form id="updateAssignmentForm" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <h6>Update Faculty-Course Assignment</h6>
+        <div class="mb-3">
+            <input type="text" class="form-control" name="assignment_id" placeholder="Assignment ID" required />
+        </div>
+        <div class="mb-3">
+            <label for="course" class="form-label">New Course</label>
+            <select class="form-select" name="updated_course_id" required>
+                {% for course in courses %}
+                    <option value="{{ course.id }}">{{ course.course_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <input type="text" class="form-control" name="updated_faculty_id" placeholder="Enter New Faculty ID" required />
+        </div>
+        <button type="submit" class="btn btn-danger" name="update_assignment">Update Assignment</button>
+    </form>
+</div>
             <!-- Delete Assignment Form -->
             <div class="form-section collapse" id="deleteAssignment">
                 <form id="deleteAssignmentForm" method="POST" enctype="multipart/form-data">

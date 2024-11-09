@@ -83,13 +83,13 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home' %}"><i class="bi bi-house-door"></i> <b>Home</b></a>
+                        <a class="nav-link" href="{% url 'faculty_dashboard' %}"><i class="bi bi-house-door"></i> <b>Home</b></a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'about' %}"><i class="bi bi-info-circle"></i> <b>About</b></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'show_courses' %}"><i class="bi bi-book"></i> <b>Courses</b></a>
+                        <a class="nav-link" href="{% url 'f_show_courses' %}"><i class="bi bi-book"></i> <b>Courses</b></a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'contact' %}"><i class="bi bi-telephone"></i> <b>Contact Us</b></a>
@@ -103,6 +103,7 @@
         <table class="table">
             <thead>
                 <tr>
+                    <th>Course ID</th>
                     <th>Course Name</th>
                     <th>Stream Name</th>
                 </tr>
@@ -110,6 +111,7 @@
             <tbody>
                 {% for course in courses %}
                 <tr>
+                    <td>{{ course.id }}</td>
                     <td>{{ course.course_name }}</td>
                     <td>{{ course.stream_name }}</td>
                 </tr>

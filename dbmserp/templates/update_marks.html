@@ -1,0 +1,197 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Marks</title>
+    <link rel="icon" href="{% static 'images/logo.png' %}" type="image/x-icon" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="icon" href="{% static 'images/logo.png' %}" type="image/x-icon" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet" />
+    <!-- Bootstrap Icons CSS -->
+<link
+href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css"
+rel="stylesheet"
+/>
+    <style>
+        
+        body {
+  background-color: #f4f6f9;
+  font-family: "Roboto", sans-serif;
+  color: #333;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Navbar Styles */
+.navbar {
+  background-color: #02012f;
+  padding: 15px 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand img {
+  height: 60px;
+  width: auto;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+/* .navbar-logo{
+  width: 50px;
+  height: 50px;
+} */
+
+.navbar-brand span {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.nav-link {
+  color: #ffffff !important;
+  margin-right: 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.nav-link:hover {
+  color: #e0e4f1 !important;
+}
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .container:hover {
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+        h1 {
+            color: #010050;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        label {
+            font-weight: 600;
+            color: #02012f;
+            margin-bottom: 5px;
+            display: inline-block;
+        }
+        .form-control {
+            margin-bottom: 20px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            transition: border-color 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #010050;
+            box-shadow: 0 0 8px rgba(1, 0, 80, 0.1);
+        }
+        button[type="submit"] {
+            width: 100%;
+            background-color: #02012f;
+            color: #fff;
+            font-weight: bold;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        button[type="submit"]:hover {
+            background-color: #010050;
+            transform: translateY(-2px);
+        }
+        .alert {
+            margin-top: 15px;
+            text-align: center;
+        }
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-label::after {
+            content: '*';
+            color: #ff4c4c;
+            margin-left: 5px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">
+            <img src="{% static 'images/logo.png' %}" alt="College Logo" class="navbar-logo"/>
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'faculty_dashboard' %}"><i class="bi bi-house-door"></i> Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'about' %}"><i class="bi bi-info-circle"></i> About</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'show_courses' %}"><i class="bi bi-book"></i> Courses</a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="{% url 'contact' %}"><i class="bi bi-telephone" style="margin-right: 5px;"></i>Contact Us</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+    <div class="container mt-5">
+        <div class="container mt-5">
+            <h1 class="text-center mb-4">Update Marks</h1>
+    
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-success">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+    
+            <form method="POST" action="{% url 'update_marks' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="id_marks_id" class="form-label">Marks ID</label>
+                    {{ form.marks_id }}  <!-- Input field for Marks ID -->
+                </div>
+                <div class="mb-3">
+                    <label for="id_course" class="form-label">Course</label>
+                    {{ form.course }}
+                </div>
+    
+                <div class="mb-3">
+                    <label for="id_marks" class="form-label">Marks</label>
+                    {{ form.marks }}
+                </div>
+    
+                <button type="submit" class="btn btn-primary">Update</button>
+                
+            </form>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

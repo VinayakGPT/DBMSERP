@@ -39,11 +39,12 @@ from dbms.views import (
     show_videos,
     show_faculty,
     about, contact,
+    course_list,
     admin_dashboard, faculty_dashboard, student_dashboard,
     s_student_view, s_library_management_view,s_show_marks,
     s_feedback_view, f_student_view, f_library_management_view,
     f_feedback_view, s_issued_books_view, s_show_feedback,
-    f_show_feedback, s_show_courses, f_show_courses
+    f_show_feedback, s_show_courses, f_show_courses,f_show_marks,show_assignment,add_marks,update_marks,delete_marks
     
 )
 
@@ -90,6 +91,7 @@ urlpatterns = [
     path('show-gallery/', show_gallery, name='show_gallery'),
     path('show_videos/', show_videos, name='show_videos'),
     path('show-faculty/', show_faculty, name='show_faculty'),
+    path('show_assignment/', show_assignment, name='show_assignment'),
     path('about/', about, name='about'),
     path('contact/', contact, name='contact'),
     path('admin_dashboard/', admin_dashboard, name='admin_dashboard'),
@@ -108,4 +110,10 @@ urlpatterns = [
     path('show_assignments/', website_management_view, name='show_assignments'),
     path('f_show_feedback/', f_show_feedback, name='f_show_feedback'),
     path('f_show_courses/', f_show_courses, name='f_show_courses'),
+    path('f_show_marks/', f_show_marks, name='f_show_marks'),
+    path('course_list/', course_list, name='course_list'),
+    path('add_marks/',add_marks,name="add_marks"),
+    path('update_marks/',update_marks,name = "update_marks"),
+    path('delete_marks/',delete_marks,name = "delete_marks"),
+    
 ]
