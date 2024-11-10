@@ -806,8 +806,15 @@ def website_management_view(request):
         elif 'add_assignment' in request.POST:
             form = AddFacultyCourseAssignmentForm(request.POST)
             if form.is_valid():
-                form.save()
-                messages.success(request, 'Faculty-course assignment added successfully.')
+                faculty_id = form.cleaned_data['faculty_id']
+                course_id = form.cleaned_data['course_id']
+                
+                # Check if a record with the same faculty_id and course_id already exists
+                if FacultyCourseAssignment.objects.filter(faculty_id=faculty_id, course_id=course_id).exists():
+                    messages.error(request, 'An assignment for this faculty and course already exists.')
+                else:
+                    form.save()
+                    messages.success(request, 'Faculty-course assignment added successfully.')
             else:
                 messages.error(request, 'Invalid data provided. Please check faculty and course IDs.')
 
@@ -1901,12 +1908,24 @@ def add_marks(request):
         form = AddMarksForm(request.POST, faculty=faculty)  # Pass faculty to the form
         if form.is_valid():
             # Automatically set the faculty field in CourseMarks instance
-            course_marks = form.save(commit=False)
-            course_marks.faculty = faculty
-            course_marks.save()
-            messages.success(request, "Marks added successfully!")
-            return redirect('add_marks') 
-             # Redirect after successful submission
+            course = form.cleaned_data['course']
+            student_id = form.cleaned_data['student_id']
+
+            # Check if a record with the same course and student_id already exists
+            if CourseMarks.objects.filter(course=course, student_id=student_id).exists():
+                messages.error(request, "An entry for this course and student already exists.")
+                form = AddMarksForm(faculty=faculty)
+            else :     
+                course_marks = form.save(commit=False)
+                course_marks.faculty = faculty
+                course_marks.save()
+                messages.success(request, "Marks added successfully!")
+                return redirect('add_marks') 
+                # Redirect after successful submission
+        else:
+            # Add error message for form errors
+            messages.error(request, "You provided incorrect course  or incorrect student id")     
+            form = AddMarksForm(faculty=faculty)
     else:
         form = AddMarksForm(faculty=faculty)  # Initialize form with faculty for GET request
 
@@ -1934,6 +1953,7 @@ def update_marks(request):
                 course_marks = CourseMarks.objects.get(id=marks_id)
             except CourseMarks.DoesNotExist:
                 messages.error(request, "Marks record not found.")
+                form = UpdateMarksForm(faculty=faculty)  # Initialize the form with the faculty context
                 return redirect('update_marks')  # Redirect to an appropriate fallback page
 
             # Ensure the course in the CourseMarks belongs to the current faculty
@@ -1945,8 +1965,12 @@ def update_marks(request):
             course_marks.save()
 
             messages.success(request, "Marks updated successfully!")
-            return redirect('update_marks')  # Redirect to an appropriate page after success
+            return redirect('update_marks') 
+         # Redirect to an appropriate page after success
+  
+      
     else:
+        
         form = UpdateMarksForm(faculty=faculty)  # Initialize the form with the faculty context
 
     return render(request, 'update_marks.html', {'form': form})
@@ -1961,9 +1985,11 @@ def delete_marks(request):
                 messages.success(request, "Marks deleted successfully!")
                 return redirect('delete_marks')  # Redirect to an appropriate page after success
             else:
-                messages.error(request, "There was an issue with deleting the marks.")
+                messages.error(request, "Marks ID not found")
+                form = DeleteMarksForm()
         else:
-            messages.error(request, "There were errors in the form.")
+            messages.error(request, "Marks ID not found")
+            form = DeleteMarksForm()
     else:
         form = DeleteMarksForm()
 
